@@ -59,7 +59,7 @@ help(Arithmetic)
 
 # Complete these operations using any operators and/or parenthesis ()
 
-# Ejemplos
+# Examples
 
 #i#  10  5   2   8   = 3.2
 10 / 5 ^ 2 * 8 
@@ -67,21 +67,18 @@ help(Arithmetic)
 #ii#  10 5  5  2 = 2 
 (10 - 5) / 5 * 2 
 
-# ¡Practica!
+# Now you!
 #iii#  2  2  4  5  10 = 51
 
 #iv#  3  3  12  3  10 = 30
 
-#v# Escribe una operación que dé como resultado 50, usando estos operadores *  /  ^  
+#v# Write an operation that results in 50, using these operators: *  /  ^  
 #EJEMPLO
 2 * 100 / 2^2
 
-#vi#  Escribe una operación que dé 39, usando estos operadores ^  /  *  +
+#vi#  Write an operation that results in 39 using these operators: ^  /  *  +
 
 
-#vii# Escribe una operación que dé 120, usando por lo menos 5 operadores
-
-
-#viii#  Construye el resultado de 10/6, usando estos operadores %%  +  %/%  /
+#vii# Write an operation that gives 120 using at least 5 different operators:
 
 
