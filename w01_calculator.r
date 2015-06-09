@@ -1,63 +1,63 @@
-######################    Introducción a R    #########################
+#################    Introduction to R Programming   ##################
 #                                                                     #
-#     Herramientas para el análisis de información de biodiversidad   #
+#                           MMU FUTURES                               #
 #                       Christian Devenish                            #
 #                                                                     #
-#                     Abril 2014, Lima, Perú                          #
-#                 Centro de Sostenbilidad Ambiental                   #
+#                     June 2015, Manchester, UK                       #
+#                 Manchester Metropolitan University                  #
 #                                                                     #
 #######################################################################
 
-#### Clase 1. ####
+####  Activity 1. Using R as a calculator ####
 
-####  Actividad 1. R como una calculadora ####
-
-# 1.1 Practica operaciones con todos los operadores, fijándote en el orden de los operadores. Calcula el resultado en tu cabeza antes de hacerlo en R. Preguntale a tu compañero
+# 1.1 Practise these operations with all the operators (plus, minus, multiplication etc), take care with the order of operators. Calculate the result in your head before you do it in R. Compare with your neighbour
 
 1 + 1
 10 - 5
 10 / 2
-2 * 5  # sin o con espacios - no importa
+2 * 5  # try it with or without spaces. Is there a difference
 2*5
     2*5
 # Los espacios pueden facilitar la lectura del código. Pero mejor uno solo.
 
-2^3  # potenciación
+2^3  # 2 to the power of three
 
-10 %% 5 # módulo (resto de la división entera)
+10 %% 5 # modulo (remainder of integer division)
 10 %% 6
 
-10 %/% 5  # división entera (resultado de la division sin decimal)
+10 %/% 5  # integer division (result of the division to the nearest integer)
 10 %/% 6
 
-## ver para ayuda
-? Arithmetic #  para todos
+## See this for more help:
+? Arithmetic #  for all operators
 
-# o con la funcion
+# or with the help() function
 help(Arithmetic)
 
-## Ojo con el orden de operadores (igual que en 3o de primaria...)
-# %...%, ^, * /, + -  etc...
+## Careful with the order of the operators - which operators go first? 
+#  ^, * /, + -  etc...
 
-#ver 
+# see this for the order (ignore the operators you are not familiar with for the moment)
 ? Syntax
 
-# por ejemplo
+# Is there a difference between these sums?
 
 10 + 10 / 2 - 1
 
 (10 + 10) /2 - 1
 
-8 - 4 * 4 + 2 #  En RStudio puedes seleccionar una parte del código en el script y ejecutarlo con ctrl + enter. ¡Pruebalo!
+8 - 4 * 4 + 2 #  Remember that in RStudio you can select your code in the scrip and execute it with ctrl + enter. Try it!
 
-# si no te acuerdas del orden, o tienes dudas, usa parentesis....
+# If you're not sure about the order, use parenthesis...
 10 + (10 / 2) - 1
 10 + 10 / 2 - 1
 
+12/24*100
+(12/24)*100
 
-# 1.2 Resolver... 
+# 1.2 Calculate... 
 
-# Completa estas operaciones usando cualquier de los operadores y parentesis
+# Complete these operations using any operators and/or parenthesis ()
 
 # Ejemplos
 
