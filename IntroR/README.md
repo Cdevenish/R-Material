@@ -9,13 +9,17 @@ Course contents
 
 [**2. Introducing objects, vectors and data frames**](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_2/index.html)  
 2.1 R as a calculator [*worksheet*](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_2/w01_calculator.r)  
-2.2. Vectors and other objects [*worksheet*](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_2/w02_vectors.r)  
+2.2. Vectors, data types, indexing [*worksheet*](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_2/w02_vectors.r)  
 
 
-**3. Dataframes**  
+**3. Dataframes**  [*worksheet*](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_3/w03_dataframes.r)  
+Indexing dataframes  
+Subsetting dataframe  
+Functions with dataframes - tapply, sapply, aggregate
 
+**4. Importing data into R**  [*worksheet*](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_4/w04_import.r)  
+Using read.table()  
+Importing text files, rdata files
+Saving data
 
-**4. Importing data into R**  
-
-
-**5 Working with dataframes**  
+**5 Simple graphics**  [*worksheet*](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_5/w05_simplegraphs.r)  
