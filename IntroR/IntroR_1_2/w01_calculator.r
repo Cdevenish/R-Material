@@ -25,6 +25,9 @@
 
 2^3  # 2 to the power of three
 
+
+## Other operators (don't worry if you don't do this part)
+
 10 %% 5 # modulo (remainder of integer division)
 10 %% 6
 
@@ -76,7 +79,7 @@ help(Arithmetic)
 #iv#  3  3  12  3  10 = 30
 
 #v# Write an operation that results in 50, using these operators: *  /  ^  
-#EJEMPLO
+#EXAMPLE
 2 * 100 / 2^2
 
 #vi#  Write an operation that results in 39 using these operators: ^  /  *  +

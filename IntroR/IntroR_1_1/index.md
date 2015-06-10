@@ -61,7 +61,7 @@ http://r4stats.com/articles/popularity</small>
 - Free (different types of free), breaks barriers in access to statistics software
 - Huge community of users
 - Support (email lists, websites, e.g. Stack Overflow)
-- Libraries (special collections of functions)  - 5391
+- Libraries (special collections of functions) : 5391 (June 2014) 6754 (June 2015)
 - Sharing code
 - More statistical applications than other software
 - Integrate with other applications (e.g. GIS, graphics)
