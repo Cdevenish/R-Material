@@ -17,7 +17,7 @@ Indexing dataframes
 Subsetting dataframe  
 Functions with dataframes - tapply, sapply, aggregate
 
-**4. Importing data into R**  [*worksheet*](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_4/w04_import.r)  
+**4. Importing data into R**  [*worksheet*](https://github.com/Cdevenish/Teaching/blob/master/IntroR/IntroR_1_4/w04_import.r) [download](http://Cdevenish.github.io/Teaching/IntroR/IntroR_1_4/w04_import.r)  
 Using read.table()  
 Importing text files, rdata files
 Saving data
