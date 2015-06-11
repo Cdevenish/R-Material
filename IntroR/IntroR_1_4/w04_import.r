@@ -80,7 +80,7 @@ identical(df3, df4)
 
 ## Often after you import and manipulate your data you save it as a .rdata file, or you may receive an .rdata file from a colleague. This files are imported with load() function
 
-load("../data/CherryTrees.rdata")
+load("data/CherryTrees.rdata")
 # Note that these files can contain several objects, and that their names are already assigned within the file. What does this file contain?
 
 ## To save R objects that you have been working with, use the save() function.
