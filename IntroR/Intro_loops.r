@@ -8,7 +8,7 @@
 ## Some exmaples of how to do loops, when to use them and when not to use them...
 
 
-setwd("J:/Documents_on_FreeAgent/MMU_ConsBiol/PhD/R/R group")
+setwd("") # set your working directory
 
 
 ## 1. Some example loops ####
@@ -431,6 +431,11 @@ ggplot(CO2, aes(x = conc, y = uptake)) +
 ## Also file operations, eg unzipping, processing data files, simulations, bootstraps, etc.
 
 
+## When doing loops... 
+  ## Do you need one?
+  ## How will you store the results?
+  ## What will you iterate over?
+  
 
 ### Now you try....
 
