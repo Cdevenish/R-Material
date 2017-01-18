@@ -5,7 +5,7 @@
 #         18 January 2017                   #
 #############################################
 
-## Some exmaples of how to do loops, when to use them and when not to use them...
+## Some examples of how to do loops, when to use them and when not to use them...
 
 
 setwd("") # set your working directory
