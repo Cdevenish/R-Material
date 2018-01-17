@@ -46,10 +46,9 @@ How to manage data from outputs
 
 
 
-## Three examples
+## Two examples
 
 - Sunset, daylength times
 
 - IUCN Red List
 
-(- Scopus)
