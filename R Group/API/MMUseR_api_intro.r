@@ -11,8 +11,6 @@ str(j1)
 j2 <- fromJSON("dogs2.json", simplifyVector = F)
 str(j2)
 
-j3 <- fromJSON("products.json")
-str(j3)
 
 ### 1. A simple API example ###
 
