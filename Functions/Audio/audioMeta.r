@@ -1,5 +1,10 @@
 ## function to extract date and start times and recorder ID
 
+## eg non reproducible example
+# f <- list.files("PATH TO AUDIO FILES", "\\.wav$", full.names = T)
+# audioMeta(f)
+
+
 audioMeta <- function(x, tz = "America/La_Paz"){
   
   library(tuneR)
