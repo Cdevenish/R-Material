@@ -4,7 +4,7 @@ audioMeta <- function(x, tz = "America/La_Paz"){
   
   library(tuneR)
   
-  # x is a vector of filepaths with files of the type:
+  # x is a vector of filepaths (eg from list.files() with files of the type:
   # without coords
   # 22_20181013_081816_Loreto_time.wav
   # OR
@@ -40,8 +40,8 @@ audioMeta <- function(x, tz = "America/La_Paz"){
   date <- as.Date(date.text, format ="%Y%m%d")
   dateTime <- strptime(paste(date.text, time.text), tz = tz, format = "%Y%m%d %H%M%S")
   
-  # recorder ID - hard coded for recorders to start with a single letter and then two digits
-  id <- gsub("B|_", "", regmatches(x, regexpr("^[[:alpha:]]{1}[[:digit:]]{1,2}_", text = x)))
+  # recorder ID - for recorders to start, optionally, with a single letter and then two digits
+  id <- gsub("B|_", "", regmatches(x, regexpr("^[[:alpha:]]?[[:digit:]]{1,2}_", text = x)))
   
   
   info.df <- data.frame(file = x,
