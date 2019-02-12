@@ -46,7 +46,7 @@ audioMeta <- function(x, tz = "America/La_Paz"){
   dateTime <- strptime(paste(date.text, time.text), tz = tz, format = "%Y%m%d %H%M%S")
   
   # recorder ID - for recorders to start, optionally, with a single letter and then two digits
-  id <- gsub("B|_", "", regmatches(x, regexpr("^[[:alpha:]]?[[:digit:]]{1,2}_", text = x)))
+  id <- gsub("_", "", regmatches(x, regexpr("^[[:alpha:]]?[[:digit:]]{1,2}_", text = x)))
   
   
   info.df <- data.frame(file = x,
