@@ -7,7 +7,7 @@
 
 openGoo <- function(sp, crs = "+proj=longlat +datum=WGS84", yx = FALSE){
   
-  ## opens coordinates (in latlon) copied into clipboard in google earth by 
+  ## opens coordinates from clipboard/spatial object (sp, sf) in google earth by 
   ## creating a kml in temporary directory
   
   ## crs is the projection of the coordinates, if copied from clipboard, ignored if sp is present
