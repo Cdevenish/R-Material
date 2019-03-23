@@ -13,9 +13,11 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   # interval - time length of regular intervals to split file into, in minutes or seconds. 
   # Note: Last segment may not be of this length
   # OR interval is a start and stop time, as a length 2 text vector, as in c('HH:MM:SS','HH:MM:SS') or 
+  
   # a length two vector with two datetime objects showing start and end points, with date corresponding 
-  # to file to be split
-  # Note must correspond to same date (ie not over midnight)
+  # to file to be split. In this case - only one interval and one file ie length(x) == 1
+  
+  # Note: interval must correspond to same date (ie not over midnight)
   
   # units for regular interval, either seconds or minutes. Ignored if interval is a duration
   # dir - is folder to save wav in, (within working directory, or full path)
@@ -92,13 +94,14 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       # in the first case, interval as HH:MM:SS
       if(all(grepl("[[:digit:]]{2}\\:[[:digit:]]{2}\\:[[:digit:]]{2}$", x = interval))){
         
+        # does all the files for the same interval:
         # get desired start and end times for each date of audio file
         start.times <- strptime(paste(date.text, interval[1]), tz = tz, format = "%Y%m%d %H:%M:%S")
         end.times <- strptime(paste(date.text, interval[2]), tz = tz, format = "%Y%m%d %H:%M:%S")
       } 
       
-      # In case of POSIX
-      if("POSIXt" %in% class(interval)){
+      # In case of POSIX - single interval (for the moment)
+      if("POSIXt" %in% sapply(interval, class)){
         # get duration specified by two times in interval
             
         # get desired start and end times for each date of audio file
@@ -119,7 +122,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       dt <- difftime(start.times, dateTime.start, units = "secs")
       # dt is time (in seconds) of desired start time after start of audio file
       
-      ind <- abs(dt) < duration # index of files where desired audio is within file
+      ind <- abs(dt) < duration # index of files where desired length of audio is within file
       
       from <- rep(NA, length(start.times))
       to <- rep(NA, length(start.times))
@@ -133,6 +136,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       ## do the wave splitting here... same as above
       
       # read sections and save for each file
+      # max = sum(sapply(from, length))
       pb <- txtProgressBar(min = 0, max = sum(!is.na(from)), style = 3, width = 100)
       
       n <- 0
