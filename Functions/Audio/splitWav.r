@@ -96,8 +96,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
     
   } else {
     
-    if(length(interval) == 2 & all(grepl("[[:digit:]]{2}\\:[[:digit:]]{2}\\:[[:digit:]]{2}$", x = interval)) |
-       all(sapply(lapply(interval, class), function(x) "POSIXt" %in% x))){
+    if(class(intervals) %in% c("POSIXt", "list", "character")){ # not so good, but for now...
       
       # initial check that the interval is specified in the correct format, ie HH:MM:SS, length 2, chr vector
       if(length(interval) == 2 & all(grepl("[[:digit:]]{2}\\:[[:digit:]]{2}\\:[[:digit:]]{2}$", x = interval))){
