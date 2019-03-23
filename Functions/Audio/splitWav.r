@@ -12,6 +12,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   # x is the vector of paths to wav files on disk, eg from list.files()
   
   # interval - can be one of three options:
+  
   # 1) time length of regular intervals to split file into, in units (minutes or seconds). 
   # Note: Last segment may not be of this length
   
