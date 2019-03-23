@@ -16,16 +16,18 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   # 1) time length of regular intervals to split file into, in units (minutes or seconds). 
   # Note: Last segment may not be of this length
   
-  # 2) interval is a start and stop time, as a length 2 text vector, as in c('HH:MM:SS','HH:MM:SS') 
+  # 2) interval is a start and stop time, as a length 2 character vector, as in c('HH:MM:SS','HH:MM:SS') 
   # All files will be split by same time interval 
   
   # 3) A list of length two vectors with two datetime objects showing start and end points, with date corresponding 
-  # to file to be split. In this case length(interval) == length(x)
+  # to date of file to be split. In this case length(interval) == length(x)
   
   # Note: interval must correspond to same date (ie not over midnight) in all cases
   
   # Units for regular interval, either seconds or minutes. Otherwise ignored 
   # dir - is folder to save wav in, (within working directory, or full path)
+  
+  # tz - timezone
   
   units <- match.arg(units)
   ## set multiplier if units in minutes
