@@ -12,7 +12,9 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   # x is the vector of paths to wav files on disk, eg from list.files()
   # interval - time length of regular intervals to split file into, in minutes or seconds. 
   # Note: Last segment may not be of this length
-  # OR interval is a start and stop time, as a length 2 text vector, as in c('HH:MM:SS','HH:MM:SS')
+  # OR interval is a start and stop time, as a length 2 text vector, as in c('HH:MM:SS','HH:MM:SS') or 
+  # a length two vector with two datetime objects showing start and end points, with date corresponding 
+  # to file to be split
   # Note must correspond to same date (ie not over midnight)
   
   # units for regular interval, either seconds or minutes. Ignored if interval is a duration
@@ -82,70 +84,85 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
     
   } else {
       
-    # initial check that the interval is specified in the correct format, ie HH:MM:SS
-    if(length(interval) == 2 & all(grepl("[[:digit:]]{2}\\:[[:digit:]]{2}\\:[[:digit:]]{2}$", x = interval))){
+    # initial check that the interval is specified in the correct format, ie HH:MM:SS, or POSIX
+    if(length(interval) == 2 & any(all(grepl("[[:digit:]]{2}\\:[[:digit:]]{2}\\:[[:digit:]]{2}$", x = interval)),
+      "POSIXt" %in% class(interval))){
       
-      # get duration specified by two times in interval
-      int.duration <- difftime(strptime(paste("20000101", interval[2]), tz = tz, format = "%Y%m%d %H:%M:%S"),
-                               strptime(paste("20000101", interval[1]), tz = tz, format = "%Y%m%d %H:%M:%S"),
-                               units = "secs")
-      
-      # get desired start and end times for each date of audio file
-      start.times <- strptime(paste(date.text, interval[1]), tz = tz, format = "%Y%m%d %H:%M:%S")
-      end.times <- strptime(paste(date.text, interval[2]), tz = tz, format = "%Y%m%d %H:%M:%S")
-      
-      #actual audio start and end times
-      # dateTime.start  is start
-      dateTime.end <- dateTime.start + duration
-      
-      # filter out those files whose audio is not within the interval specified by `interval` 
-      # which files are within these times? Get Time in seconds from start of audio file
-      dt <- difftime(start.times, dateTime.start, units = "secs")
-      # dt is time (in seconds) of desired start time after start of audio file
-      
-      ind <- abs(dt) < duration # index of files where desired audio is within file
-      
-      from <- rep(NA, length(start.times))
-      to <- rep(NA, length(start.times))
-      
-      from[ind] <- ifelse(dt[ind]<0 , 0, dt[ind])
-      
-      des.end <- from + int.duration # desired duration in seconds after start of audio file
-      to <- ifelse(des.end<duration, des.end, duration)
-      # from; to
-      
-      ## do the wave splitting here... same as above
-      
-      # read sections and save for each file
-      pb <- txtProgressBar(min = 0, max = sum(!is.na(from)), style = 3, width = 100)
-      
-      n <- 0
-      
-      for(i in seq_along(from)[!is.na(from)]){
-    
-        n <- n+1
-        setTxtProgressBar(pb, n)
-          
-        # get wav file
-        tmp <- readWave(x[i], from = from[i], to = to[i], units = units)
+      # in the first case, interval as HH:MM:SS
+      if(all(grepl("[[:digit:]]{2}\\:[[:digit:]]{2}\\:[[:digit:]]{2}$", x = interval))){
         
-        # edit file name - insert new start time and section number
-        newStartTime <- dateTime.start[i] + from[i] * f
-        new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
-        new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
-          
-        # add path to file name
-        if(missing(dir)) {
-          new.file.name <- file.path(dirname(x[i]), new.bn)} else {
-            new.file.name <- file.path(dir, new.bn)
-            }
-          
-          writeWave(tmp, filename = new.file.name)
-          # or use seewave::savewav if need to change file...
-          
-          fn[i] <- new.file.name
-          
+        # get desired start and end times for each date of audio file
+        start.times <- strptime(paste(date.text, interval[1]), tz = tz, format = "%Y%m%d %H:%M:%S")
+        end.times <- strptime(paste(date.text, interval[2]), tz = tz, format = "%Y%m%d %H:%M:%S")
+      } 
+      
+      # In case of POSIX
+      if("POSIXt" %in% class(interval)){
+        # get duration specified by two times in interval
+            
+        # get desired start and end times for each date of audio file
+        start.times <- interval[1]
+        end.times <- interval[2]
+        
       }
+      
+      int.duration <- difftime(end.times, start.times, units = "secs")
+      
+      
+    }
+    
+    #actual audio start and end times
+    # dateTime.start  is start
+    dateTime.end <- dateTime.start + duration
+    
+    # filter out those files whose audio is not within the interval specified by `interval` 
+    # which files are within these times? Get Time in seconds from start of audio file
+    dt <- difftime(start.times, dateTime.start, units = "secs")
+    # dt is time (in seconds) of desired start time after start of audio file
+    
+    ind <- abs(dt) < duration # index of files where desired audio is within file
+    
+    from <- rep(NA, length(start.times))
+    to <- rep(NA, length(start.times))
+    
+    from[ind] <- ifelse(dt[ind]<0 , 0, dt[ind])
+    
+    des.end <- from + int.duration # desired duration in seconds after start of audio file
+    to <- ifelse(des.end<duration, des.end, duration)
+    # from; to
+    
+    ## do the wave splitting here... same as above
+    
+    # read sections and save for each file
+    pb <- txtProgressBar(min = 0, max = sum(!is.na(from)), style = 3, width = 100)
+    
+    n <- 0
+    
+    for(i in seq_along(from)[!is.na(from)]){
+      
+      n <- n+1
+      setTxtProgressBar(pb, n)
+      
+      # get wav file
+      tmp <- readWave(x[i], from = from[i], to = to[i], units = units)
+      
+      # edit file name - insert new start time and section number
+      newStartTime <- dateTime.start[i] + from[i] * f
+      new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
+      new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
+      
+      # add path to file name
+      if(missing(dir)) {
+        new.file.name <- file.path(dirname(x[i]), new.bn)} else {
+          new.file.name <- file.path(dir, new.bn)
+        }
+      
+      writeWave(tmp, filename = new.file.name)
+      # or use seewave::savewav if need to change file...
+      
+      fn[i] <- new.file.name
+      
+    }
       
       close(pb)
       
