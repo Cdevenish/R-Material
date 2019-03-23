@@ -2,7 +2,7 @@
 
 Most functions are for specific file types (e.g. processing .wav files from Frontier Labs BAR) or with monitoR package.
 
-You can source these from here with something like this (*Remember to use the url to the raw version of the file:*):
+You can source these from here with something like this (*note this links to the raw version of the file:*):
 
 `source("https://raw.githubusercontent.com/Cdevenish/R-Material/master/Functions/openGoo.r")`
 
