@@ -126,7 +126,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       
       # filter out those files whose audio is not within the interval specified by `interval` 
       # which files are within these times? Get Time in seconds from start of audio file
-      dt <- difftime(start.times, dateTime.start, units = "secs")
+      dt <- mapply(function(x, y) difftime(x, y, units = "secs"), start.times, dateTime.start)
       # dt is time (in seconds) of desired start time after start of audio file
       
       ind <- abs(dt) < duration # index of files where desired length of audio is within file
