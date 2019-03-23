@@ -100,17 +100,19 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
         end.times <- strptime(paste(date.text, interval[2]), tz = tz, format = "%Y%m%d %H:%M:%S")
       } 
       
-      # In case of POSIX - single interval (for the moment)
-      if("POSIXt" %in% sapply(interval, class)){
+      # In case of POSIX - list of c(POSIX from, POSIX to). Must be same length as x
+      if(all(sapply(lapply(interval, class), function(x) "POSIXt" %in% x))){
+        
+        if(length(x) != length(interval)) stop("interval must be same length as x if using POSIXt format")
+        
         # get duration specified by two times in interval
-            
         # get desired start and end times for each date of audio file
-        start.times <- interval[1]
-        end.times <- interval[2]
+        start.times <- lapply(interval, function(x) x[1])
+        end.times <- lapply(interval, function(x) x[2])
         
       }
       
-      int.duration <- difftime(end.times, start.times, units = "secs")
+      int.duration <- mapply(function(x,y) difftime(x, y, units = "secs"), end.times, start.times)
       
       
       #actual audio start and end times
