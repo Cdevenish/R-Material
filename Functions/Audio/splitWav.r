@@ -79,6 +79,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
         
       }
     }
+    
     close(pb)
     
     
@@ -109,60 +110,58 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       int.duration <- difftime(end.times, start.times, units = "secs")
       
       
-    }
-    
-    #actual audio start and end times
-    # dateTime.start  is start
-    dateTime.end <- dateTime.start + duration
-    
-    # filter out those files whose audio is not within the interval specified by `interval` 
-    # which files are within these times? Get Time in seconds from start of audio file
-    dt <- difftime(start.times, dateTime.start, units = "secs")
-    # dt is time (in seconds) of desired start time after start of audio file
-    
-    ind <- abs(dt) < duration # index of files where desired audio is within file
-    
-    from <- rep(NA, length(start.times))
-    to <- rep(NA, length(start.times))
-    
-    from[ind] <- ifelse(dt[ind]<0 , 0, dt[ind])
-    
-    des.end <- from + int.duration # desired duration in seconds after start of audio file
-    to <- ifelse(des.end<duration, des.end, duration)
-    # from; to
-    
-    ## do the wave splitting here... same as above
-    
-    # read sections and save for each file
-    pb <- txtProgressBar(min = 0, max = sum(!is.na(from)), style = 3, width = 100)
-    
-    n <- 0
-    
-    for(i in seq_along(from)[!is.na(from)]){
+      #actual audio start and end times
+      # dateTime.start  is start
+      dateTime.end <- dateTime.start + duration
       
-      n <- n+1
-      setTxtProgressBar(pb, n)
+      # filter out those files whose audio is not within the interval specified by `interval` 
+      # which files are within these times? Get Time in seconds from start of audio file
+      dt <- difftime(start.times, dateTime.start, units = "secs")
+      # dt is time (in seconds) of desired start time after start of audio file
       
-      # get wav file
-      tmp <- readWave(x[i], from = from[i], to = to[i], units = units)
+      ind <- abs(dt) < duration # index of files where desired audio is within file
       
-      # edit file name - insert new start time and section number
-      newStartTime <- dateTime.start[i] + from[i] * f
-      new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
-      new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
+      from <- rep(NA, length(start.times))
+      to <- rep(NA, length(start.times))
       
-      # add path to file name
-      if(missing(dir)) {
-        new.file.name <- file.path(dirname(x[i]), new.bn)} else {
-          new.file.name <- file.path(dir, new.bn)
-        }
+      from[ind] <- ifelse(dt[ind]<0 , 0, dt[ind])
       
-      writeWave(tmp, filename = new.file.name)
-      # or use seewave::savewav if need to change file...
+      des.end <- from + int.duration # desired duration in seconds after start of audio file
+      to <- ifelse(des.end<duration, des.end, duration)
+      # from; to
       
-      fn[i] <- new.file.name
+      ## do the wave splitting here... same as above
       
-    }
+      # read sections and save for each file
+      pb <- txtProgressBar(min = 0, max = sum(!is.na(from)), style = 3, width = 100)
+      
+      n <- 0
+      
+      for(i in seq_along(from)[!is.na(from)]){
+        
+        n <- n+1
+        setTxtProgressBar(pb, n)
+        
+        # get wav file
+        tmp <- readWave(x[i], from = from[i], to = to[i], units = units)
+        
+        # edit file name - insert new start time and section number
+        newStartTime <- dateTime.start[i] + from[i] * f
+        new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
+        new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
+        
+        # add path to file name
+        if(missing(dir)) {
+          new.file.name <- file.path(dirname(x[i]), new.bn)} else {
+            new.file.name <- file.path(dir, new.bn)
+          }
+        
+        writeWave(tmp, filename = new.file.name)
+        # or use seewave::savewav if need to change file...
+        
+        fn[i] <- new.file.name
+        
+      }
       
       close(pb)
       
