@@ -32,11 +32,13 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   w <- lapply(x, readWave, header = T)
   duration <- sapply(w, function(z) (z$samples/z$sample.rate)) # duration in seconds
   
-  fn <- vector()
+  fn <- vector() # create vector for new filenames
   
   if(length(interval)==1 & is.numeric(interval)){
   
-    duration <- duration/f # convert duration to units of interval  
+    duration <- duration/f # convert duration to units of interval
+    
+    # Create vectors of sequences of starting and ending points (one vector for each filename)
     from <- lapply(duration, function(x) seq(0, x, interval))
     to <- mapply(function(x, y) c(x[-1], y), from, duration)
     
@@ -69,7 +71,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
           }
         
         writeWave(tmp, filename = new.file.name)
-        # or use seewave::savewav if need to change file...
+        # or use seewave::savewav if need to change file type?...
         
         fn[i] <- new.file.name
         
@@ -80,10 +82,10 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
     
   } else {
       
-    
+    # initial check that the interval is specified in the correct format, ie HH:MM:SS
     if(length(interval) == 2 & all(grepl("[[:digit:]]{2}\\:[[:digit:]]{2}\\:[[:digit:]]{2}$", x = interval))){
       
-      
+      # get duration specified by two times in interval
       int.duration <- difftime(strptime(paste("20000101", interval[2]), tz = tz, format = "%Y%m%d %H:%M:%S"),
                                strptime(paste("20000101", interval[1]), tz = tz, format = "%Y%m%d %H:%M:%S"),
                                units = "secs")
@@ -96,6 +98,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       # dateTime.start  is start
       dateTime.end <- dateTime.start + duration
       
+      # filter out those files whose audio is not within the interval specified by `interval` 
       # which files are within these times? Get Time in seconds from start of audio file
       dt <- difftime(start.times, dateTime.start, units = "secs")
       # dt is time (in seconds) of desired start time after start of audio file
