@@ -5,7 +5,7 @@
 # audio.df <- audioMeta(f)
 
 
-audioMeta <- function(x, tz = "America/La_Paz"){
+audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   
   library(tuneR)
   
@@ -40,7 +40,7 @@ audioMeta <- function(x, tz = "America/La_Paz"){
   y.coord <- sapply(xycoords, function(x) as.numeric(x[1]))
   x.coord <- sapply(xycoords, function(x) as.numeric(x[2]))
   
-  coord.ind <- grepl(pattern = "\\[", x = xn)
+  coord.ind <- grepl(pattern = "\\[", x = xn) # are coords included in filename?
   
   date <- as.Date(date.text, format ="%Y%m%d")
   dateTime <- strptime(paste(date.text, time.text), tz = tz, format = "%Y%m%d %H%M%S")
@@ -58,7 +58,7 @@ audioMeta <- function(x, tz = "America/La_Paz"){
                         dateTime = dateTime,
                         x = NA,
                         y = NA,
-                        duration = duration)
+                        duration = duration, ...)
   
   info.df[coord.ind,c("x", "y")] <- cbind(x.coord, y.coord)
   
