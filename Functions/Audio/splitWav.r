@@ -33,9 +33,6 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   
   # Check format of interval
   
-  stop("interval must be either a numeric vector (length 1), character vector (length 2), or list (POSIXt)")
-  
-  
   ## date time for each file
   date.text <- gsub("_", "", regmatches(x, regexpr("_[[:digit:]]{8}_", text = x)))
   time.text <- gsub("_", "", regmatches(x, regexpr("_[[:digit:]]{6}_", text = x)))
