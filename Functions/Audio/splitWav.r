@@ -181,7 +181,8 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
         writeWave(tmp, filename = new.file.name)
         # or use seewave::savewav if need to change file...
         
-        fn[i] <- new.file.name
+        # use which to get sequential fn 1:n, rather than filling with NAs..  cause of i... is not sequential
+        fn[which(i == seq_along(from)[!is.na(from)])] <- new.file.name
         
       }
       
