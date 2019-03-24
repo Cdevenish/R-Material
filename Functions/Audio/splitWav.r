@@ -59,6 +59,8 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
     # read sections and save for each file
     pb <- txtProgressBar(min = 0, max = sum(sapply(from, length)), style = 3, width = 100)
     
+    fn.old <- x
+    
     n <- 0
     
     for(i in seq_along(from)){
@@ -118,7 +120,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
         
       }
       
-      
+      # duration (in seconds) of desired audio extract
       int.duration <- mapply(function(x,y) difftime(x, y, units = "secs"), end.times, start.times)
       
       
@@ -127,11 +129,16 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       dateTime.end <- dateTime.start + duration
       
       # filter out those files whose audio is not within the interval specified by `interval` 
-      # which files are within these times? Get Time in seconds from start of audio file
-      dt <- mapply(function(x, y) difftime(x, y, units = "secs"), start.times, dateTime.start)
-      # dt is time (in seconds) of desired start time after start of audio file
       
-      ind <- abs(dt) < duration # index of files where desired length of audio is within file
+      # difftime(t2, t1) == t2 - t1
+      
+      # which files are within these times? Get Time in seconds from start of audio file to start of desired time
+      dt <- mapply(function(x, y) difftime(x, y, units = "secs"), start.times, dateTime.start)
+      # dt is period (in seconds) of desired start time after start of audio file
+      
+      
+      ind <- (dt + int.duration) > 0 & (dt + int.duration) < duration 
+      # index of files where desired length of audio is within file
       
       from <- rep(NA, length(start.times))
       to <- rep(NA, length(start.times))
@@ -143,6 +150,8 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       # from; to
       
       ## do the wave splitting here... same as above
+      
+      fn.old <- x[ind]
       
       # read sections and save for each file
       # max = sum(sapply(from, length))
@@ -182,7 +191,7 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   }
   
   #res <- data.frame(originalFile = x, newFile = fn, start = from, end = to) #, startTime = )
-  return(fn)
+  return(list(newFile = fn, oldFile = fn.old))
 }
 
 
