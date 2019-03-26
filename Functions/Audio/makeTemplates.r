@@ -23,7 +23,7 @@ makeTemplates <- function(path, tmptxt = "TEMPLATE", dens = 0.1, tz = "", labels
   
   ## labels = origin of labels..   Audacity, Raven.. generic dataframe... TODO
   
-  ## function to read audacity labels.
+  ## function to read audacity labels:
   read.audacity.lab <- function(x){
     
     labs <- lapply(x, read.table, header = F, sep = "\t", stringsAsFactors= F)
