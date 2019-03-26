@@ -5,10 +5,7 @@
 ## Function will match labels and sound files based on common filename, then extract templates for each 
 # labelled audio.
 
-# eg path <- "C:/Users/55116479/Desktop/JTrogon"
-# tmptxt <- "TEMPLATE"
-
-makeTemplates - function(path, tmptxt = "TEMPLATE", dens = 0.1, tz = "", labels = c("Audacity", "Raven"), ...){
+makeTemplates <- function(path, tmptxt = "TEMPLATE", dens = 0.1, tz = "", labels = c("Audacity", "Raven"), ...){
   
   library(tuneR) # to read waves in makeCorTemplate
   library(monitoR)
