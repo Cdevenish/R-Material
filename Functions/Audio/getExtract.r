@@ -1,6 +1,8 @@
 ### Function to get mp3 xtracts from a gdetects object
 
 
+## TO DO>..  change file name with new start time... 
+
 
 getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
   
@@ -33,6 +35,10 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
     
     new.bn <- basename(fn[i])
     new.bn <- sub("\\.wav$", sprintf("_extract%02d.wav",i), new.bn)
+    
+    #newStartTime <- dateTime.start[i] + from[i] * f
+    # new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
+    # new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
     
     
     if(missing(dir)) {
