@@ -5,6 +5,7 @@
 getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
   
   
+  library(tuneR)
   
   # x is a gedetect object
   # fn = vector of filenames (same nrow as gdetect), or a cdetects or cssores object corresponding to gdetect object
@@ -28,7 +29,7 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
   
   for(i in 1:nrow(x)){
     
-    tmp <- readWave(fn[i], from[i], to[i], units = "seconds")
+    tmp <- tunerR::readWave(fn[i], from[i], to[i], units = "seconds")
     
     new.bn <- basename(fn[i])
     new.bn <- sub("\\.wav$", sprintf("_extract%02d.wav",i), new.bn)
@@ -40,7 +41,7 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
         new.file.name <- file.path(dir, new.bn)
       }
     
-    writeWave(tmp, filename = new.file.name)
+    tuneR::writeWave(tmp, filename = new.file.name)
     
     
   }
