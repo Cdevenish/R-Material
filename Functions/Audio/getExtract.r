@@ -31,7 +31,7 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
   
   for(i in 1:nrow(x)){
     
-    tmp <- tunerR::readWave(fn[i], from[i], to[i], units = "seconds")
+    tmp <- tuneR::readWave(fn[i], from[i], to[i], units = "seconds")
     
     new.bn <- basename(fn[i])
     new.bn <- sub("\\.wav$", sprintf("_extract%02d.wav",i), new.bn)
