@@ -18,8 +18,8 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
   # new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
   # new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
   
-  from <- x$time - 5
-  to <- x$time + 5
+  from <- x$time - buffer
+  to <- x$time + buffer
   
   ## need to work this out for multplie survey and gdetects objects. t... 
   
