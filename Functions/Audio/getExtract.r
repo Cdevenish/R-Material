@@ -47,7 +47,7 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
         new.file.name <- file.path(dir, new.bn)
       }
     
-    tuneR::writeWave(tmp, filename = new.file.name)
+    tuneR::writeWave(tmp, filename = new.file.name, extensible = TRUE)
     
     
   }
