@@ -1,7 +1,7 @@
 
 
 
-filter_pts <- function(r, pts, ext, crs, res, orig = c(0,0), writeID = F){
+filter_pts <- function(r, pts, ext, crs, res, orig = c(0,0), writeID = F, gridID = "gridID"){
   
   library(raster)
   library(sf) # fix for converting within raster.. but should code all separately... 
@@ -45,13 +45,19 @@ filter_pts <- function(r, pts, ext, crs, res, orig = c(0,0), writeID = F){
   } else {
     
     ## check column name doesn't already exist... 
-    if("gridID" %in% colnames(pts)){
+    
+    if(gridID %in% colnames(pts)){
       
-      l <- length(colnames(pts))
-      pts <- cbind(pts, grd.pts.id)
-      colnames(pts)[l+1] <- paste0("gridID", paste(as.integer(runif(5, 0,9)), collapse = ""))
+      # ask if gridID should be overwritten or suggest new name
       
-    } else pts$gridID <- grd.pts.id
+      # l <- length(colnames(pts))
+      # pts <- cbind(pts, grd.pts.id)
+      # colnames(pts)[l+1] <- paste0("gridID", paste(as.integer(runif(5, 0,9)), collapse = ""))
+      
+      ## add next number
+      
+      
+    } else pts[, gridID] <- grd.pts.id
     
     return(pts)
     
