@@ -54,7 +54,9 @@ filter_pts <- function(r, pts, ext, crs, res, orig = c(0,0), writeID = F, gridID
       # pts <- cbind(pts, grd.pts.id)
       # colnames(pts)[l+1] <- paste0("gridID", paste(as.integer(runif(5, 0,9)), collapse = ""))
       
-      ## add next number
+      ## for now.. warning
+      pts[, gridID] <- grd.pts.id
+      warning(gridID, " column is being overwritten")
       
       
     } else pts[, gridID] <- grd.pts.id
