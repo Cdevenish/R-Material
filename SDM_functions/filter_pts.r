@@ -1,13 +1,15 @@
 
 
 
-filter_pts <- function(r, pts, ext, crs, res, orig = c(0,0)){
+filter_pts <- function(r, pts, ext, crs, res, orig = c(0,0), writeID = F){
   
   library(raster)
+  library(sf) # fix for converting within raster.. but should code all separately... 
   
   # r is one of the prediction rasters (ie same extent, resolution, crs as all predictors), 
   ## if used, ignores ext, crs and res
   # pts is either sp or sf points spatial object
+  # writeID - logical. If TRUE, then returns unchanged points with a grid ID as new field. Default is false
   
   # make regular grid
   if(missing(r)) r <- raster(ext, crs = crs, res = res) else r <- raster(r)
@@ -21,10 +23,12 @@ filter_pts <- function(r, pts, ext, crs, res, orig = c(0,0)){
   #r
   
   # extract id value to each occ point
-  grd.pts.id <- extract(r, pts)
+  grd.pts.id <- raster::extract(r, pts)
   
   # how many repeated values?
   print(sprintf("%s grid cells have more than one record", sum(table(grd.pts.id)>1)))
+  
+  if(!writeID){
   
   ## keep first duplicated point, delete rest
   dups <- duplicated(grd.pts.id)
@@ -35,6 +39,23 @@ filter_pts <- function(r, pts, ext, crs, res, orig = c(0,0)){
   print(sprintf("%s records eliminated", sum(dups)))
   
   pts.filt <- pts[!dups,]
+  
+  return(pts.filt)
+  
+  } else {
+    
+    ## check column name doesn't already exist... 
+    if("gridID" %in% colnames(pts)){
+      
+      l <- length(colnames(pts))
+      pts <- cbind(pts, grd.pts.id)
+      colnames(pts)[l+1] <- paste0("gridID", paste(as.integer(runif(5, 0,9)), collapse = ""))
+      
+    } else pts$gridID <- grd.pts.id
+    
+    return(pts)
+    
+  } 
 }
 
 # 
