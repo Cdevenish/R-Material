@@ -2,10 +2,19 @@
 ## function to split wav files into smaller chunks, eg 15 second blocks for analysis or 10 minutes for 
 ## easier viewing in audacity
 
+## save = F, then will output dataframe of filenames and start/stop times which can be used tih 
+## seewave::readWave() from and to arguments. This, rather than splitting and saving files.
+
 #tz <- "America/La_Paz"
 #tz <- "Asia/Jakarta"
 
-splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz = "Asia/Jakarta"){
+splitWav <- function(x, 
+                     interval = 600, 
+                     units = c("seconds", "minutes"), 
+                     t.limits, 
+                     dir, 
+                     tz = "Asia/Jakarta", 
+                     save = F){
   
   library(tuneR)
   
@@ -25,15 +34,33 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   # Note: interval must correspond to same date (ie not over midnight) in all cases
   
   # Units for regular interval, either seconds or minutes. Otherwise ignored 
+  
+  # BELOW ONLY Implemented for when interval is a time period so far.
+  # t.limits is a length 2 character vector, as in c('HH:MM:SS','HH:MM:SS') to limit interval creation within this
+  # if missing, the whole wav file in path will be split according to interval
+  
   # dir - is folder to save wav in, (within working directory, or full path)
   
   # tz - timezone
+  
+  # save. logical. T files are split according to interval within t.limits and saved as new wav files. 
+  # if false, a data.frame will be output with filename, and start and stop times of each particular split file
+  # useful for using with seewave::readWave arguments, path, from, to,
+  
   
   units <- match.arg(units)
   ## set multiplier if units in minutes
   if(units == "seconds" | missing(units)) f <- 1 else f <- 60
   
   # Check format of interval
+  
+  
+  # check format of t.limits: HH:MM:SS'
+  if(!missing(t.limits)){
+    if(class(t.limits) != "character" | !all(grepl("[[:digit:]]{2}:[[:digit:]]{2}:[[:digit:]]{2}", t.limits))) {
+      stop("t.limits must be a character vector of the form HH:MM:SS")
+    }
+  }
   
   ## date time for each file
   date.text <- gsub("_", "", regmatches(x, regexpr("_[[:digit:]]{8}_", text = x)))
@@ -46,56 +73,96 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
   
   fn <- vector() # create vector for new filenames
   
+  ## Case 1 - interval is a single number - files will be split into even segments of length interval
+  
   if(length(interval)==1 & is.numeric(interval)){
   
     duration <- duration/f # convert duration to units of interval
     
     # Create vectors of sequences of starting and ending points (one vector for each filename)
-    from <- lapply(duration, function(x) seq(0, x, interval))
-    to <- mapply(function(x, y) c(x[-1], y), from, duration)
+    from <- lapply(duration, function(x) seq(0, x, interval)[-length(seq(0, x, interval))]) # minus end point
+    to <- mapply(function(x, y) c(x[-1], y), from, duration, SIMPLIFY = F) # add on last point, take off first
+    
+    #all(lengths(from) == lengths(to))
+    
+    ## adjust to, from, x, datetimeStart to be within t.limits if not missing
+    if(!missing(t.limits)){
+      
+      ## add to dateTimeStart - get times for each segment start
+      segStart <- mapply(function(x, y)  x + y*f, dateTime.start, from) # times f to convert to seconds
+      
+      # get limit of start time per file
+      t.limit.start <- strptime(paste(date.text, t.limits[1]), tz = tz, format = "%Y%m%d %H:%M:%S")
+      t.limit.end <- strptime(paste(date.text, t.limits[2]), tz = tz, format = "%Y%m%d %H:%M:%S")
+      
+      # get indices per wavefile for which segments start before t.limit
+      start.ind <- mapply(function(x,y,z) which(x >= y & x <= z), segStart, t.limit.start, t.limit.end)
+      
+      ## choose to and from
+      from <- mapply(function(x, y) x[y], from, start.ind)
+      to <- mapply(function(x, y) x[y], to, start.ind)
+      
+      ## deal with files that are left with no segments/splits
+      # which(sapply(from, function(x) length(x) == 0))
+      null.files <- which(lengths(from) == 0)
+      
+      # update from , to and filenames
+      x <- x[-null.files]
+      to <- to[-null.files]
+      from <- from[-null.files]
+      dateTime.start <- dateTime.start[-null.files]
+      
+    } # end of adjust t.limits
     
     # do the splitting here - could make this neater by combining this section for both types of interval
-    
     # read sections and save for each file
-    pb <- txtProgressBar(min = 0, max = sum(sapply(from, length)), style = 3, width = 100)
     
-    fn.old <- x
-    
-    n <- 0
-    
-    for(i in seq_along(from)){
+    if(save){
       
-      for(j in seq_along(from[[i]])){
+      pb <- txtProgressBar(min = 0, max = sum(sapply(from, length)), style = 3, width = 100)
+      
+      fn.old <- x
+      
+      n <- 0
+      
+      for(i in seq_along(from)){ # each wav file (number of wav filenames going in)
         
-        n <- n+1
-        setTxtProgressBar(pb, n)
-        
-        # get wav file
-        tmp <- readWave(x[i], from = from[[i]][j], to = to[[i]][j], units = units)
-        
-        # edit file name - insert new start time and section number
-        newStartTime <- dateTime.start[i] + from[[i]][j] * f
-        new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
-        new.bn <- sub("\\.wav$", sprintf("_s%02d.wav", j), new.bn)
-        
-        # add path to file name
-        if(missing(dir)) {
-          new.file.name = file.path(dirname(x[i]), new.bn)} else {
-            new.file.name = file.path(dir, new.bn)
-          }
-        
-        writeWave(tmp, filename = new.file.name)
-        # or use seewave::savewav if need to change file type?...
-        
-        fn[i] <- new.file.name
-        
+        for(j in seq_along(from[[i]])){ # each sequence of intervals (number of new files/splits) 
+          # different if files are of different lengths
+          
+          n <- n+1
+          setTxtProgressBar(pb, n)
+          
+          # get wav file
+          tmp <- readWave(x[i], from = from[[i]][j], to = to[[i]][j], units = units)
+          
+          # edit file name - insert new start time and section number
+          newStartTime <- dateTime.start[i] + from[[i]][j] * f
+          new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
+          new.bn <- sub("\\.wav$", sprintf("_s%02d.wav", j), new.bn)
+          
+          # add path to file name
+          if(missing(dir)) {
+            new.file.name = file.path(dirname(x[i]), new.bn)} else {
+              new.file.name = file.path(dir, new.bn)
+            }
+          
+          writeWave(tmp, filename = new.file.name)
+          # or use seewave::savewav if need to change file type?...
+          
+          fn[i] <- new.file.name
+          
+        }
       }
-    }
+      
+      close(pb)
     
-    close(pb)
+    } # end of save loop
     
     
   } else {
+    
+    ### NOT ADJUSTED FOR t.limits() yet... 
     
     if(class(interval) %in% c("POSIXt", "list", "character")){ # not so good, but for now...
       
@@ -153,46 +220,57 @@ splitWav <- function(x, interval = 600, units = c("seconds", "minutes"), dir, tz
       
       fn.old <- x[ind]
       
-      # read sections and save for each file
-      # max = sum(sapply(from, length))
-      pb <- txtProgressBar(min = 0, max = sum(!is.na(from)), style = 3, width = 100)
       
-      n <- 0
-      
-      for(i in seq_along(from)[!is.na(from)]){
+      if(save){
         
-        n <- n+1
-        setTxtProgressBar(pb, n)
+        # read sections and save for each file
+        # max = sum(sapply(from, length))
+        pb <- txtProgressBar(min = 0, max = sum(!is.na(from)), style = 3, width = 100)
         
-        # get wav file
-        tmp <- readWave(x[i], from = from[i], to = to[i], units = units)
+        n <- 0
         
-        # edit file name - insert new start time and section number
-        newStartTime <- dateTime.start[i] + from[i] * f
-        new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
-        new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
+        for(i in seq_along(from)[!is.na(from)]){
+          
+          n <- n+1
+          setTxtProgressBar(pb, n)
+          
+          # get wav file
+          tmp <- readWave(x[i], from = from[i], to = to[i], units = units)
+          
+          # edit file name - insert new start time and section number
+          newStartTime <- dateTime.start[i] + from[i] * f
+          new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
+          new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
+          
+          # add path to file name
+          if(missing(dir)) {
+            new.file.name <- file.path(dirname(x[i]), new.bn)} else {
+              new.file.name <- file.path(dir, new.bn)
+            }
+          
+          writeWave(tmp, filename = new.file.name)
+          # or use seewave::savewav if need to change file...
+          
+          # use which to get sequential fn 1:n, rather than filling with NAs..  cause of i... is not sequential
+          fn[which(i == seq_along(from)[!is.na(from)])] <- new.file.name
+          
+        }
         
-        # add path to file name
-        if(missing(dir)) {
-          new.file.name <- file.path(dirname(x[i]), new.bn)} else {
-            new.file.name <- file.path(dir, new.bn)
-          }
+        close(pb)
         
-        writeWave(tmp, filename = new.file.name)
-        # or use seewave::savewav if need to change file...
-        
-        # use which to get sequential fn 1:n, rather than filling with NAs..  cause of i... is not sequential
-        fn[which(i == seq_along(from)[!is.na(from)])] <- new.file.name
-        
-      }
-      
-      close(pb)
+      } # end of save loop
       
     } else stop("interval must be either a numeric vector (length 1), character vector (length 2), or list (POSIXt)")
   }
   
+  if(!save){
+    
+    df.names <- data.frame(filename = rep(x, lengths(from)), from = unlist(from), to = unlist(to))
+    return(df.names)
+    
+    
+  } else return(list(newFile = fn, oldFile = fn.old))
   #res <- data.frame(originalFile = x, newFile = fn, start = from, end = to) #, startTime = )
-  return(list(newFile = fn, oldFile = fn.old))
 }
 
 
