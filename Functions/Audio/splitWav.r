@@ -265,7 +265,8 @@ splitWav <- function(x,
   
   if(!save){
     
-    df.names <- data.frame(filename = rep(x, lengths(from)), from = unlist(from), to = unlist(to))
+    df.names <- data.frame(filename = rep(x, lengths(from)), from = unlist(from), to = unlist(to),
+                           stringsAsFactors = F)
     return(df.names)
     
     
