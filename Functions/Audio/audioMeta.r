@@ -19,7 +19,21 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   # tz is the time zone in format given by OlsonNames()
   
   # get duration
-  w <- lapply(x, readWave, header = T)
+  w <- lapply(x, function(z) try(readWave(z, header = T), silent = T))
+  
+  tryError.ind <- vapply(w, function(x) inherits(x, "try-error"), logical(1))
+  noErr <- sum(tryError.ind)
+
+  # if any wavs failed to read, then remove from w AND x and continue, with warning at end
+  if(noErr != 0){
+    
+    w <- w[!tryError.ind]
+    dodgy.files <- x[tryError.ind]
+    x <- x[!tryError.ind]
+    warning(paste(noErr, "wav files failed to read - possibly corrupt\nCheck these files:", dodgy.files))
+    
+  }
+  
   duration <- sapply(w, function(z) (z$samples/z$sample.rate)/60) # in minutes
   
   ## get some file info
