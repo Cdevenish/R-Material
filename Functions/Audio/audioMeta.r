@@ -47,7 +47,7 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   
   dateTime_end <- dateTime_start + duration*60 # duration in minutes, so *60
   #date_end <- date + (duration/60) %/% 24  # duration in hours, as an integer division of 24
-  date_end <- format(dateTime_end, "%Y%m%d") # maybe safer... 
+  date_end <- as.Date(dateTime_end, tz = tz, format = "%Y%m%d") # maybe safer... 
   
   # recorder ID - for recorders to start, optionally, with a single letter and then two digits
   id <- gsub("_", "", regmatches(xn, regexpr("^[[:alpha:]]?[[:digit:]]{1,2}_", text = xn)))
@@ -65,13 +65,14 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
                         dateTime_end = dateTime_end,
                         x = NA,
                         y = NA,
-                        duration = duration, ...)
+                        duration = duration, stringsAsFactors = F,...)
   
   info.df[coord.ind,c("x", "y")] <- cbind(x.coord, y.coord)
   
   #rm(date.text, time.text, coord.text, xycoords, coord.ind, x.coord, y.coord)
   
   info.df
+  #str(info.df)
   
 }
 
