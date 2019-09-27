@@ -45,6 +45,10 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   date <- as.Date(date.text, format ="%Y%m%d")
   dateTime <- strptime(paste(date.text, time.text), tz = tz, format = "%Y%m%d %H%M%S")
   
+  dateTime_end <- dateTime + duration*60 # duration in minutes, so *60
+  #date_end <- date + (duration/60) %/% 24  # duration in hours, as an integer division of 24
+  date_end <- format(dateTime_end, "%Y%m%d") # maybe safer... 
+  
   # recorder ID - for recorders to start, optionally, with a single letter and then two digits
   id <- gsub("_", "", regmatches(xn, regexpr("^[[:alpha:]]?[[:digit:]]{1,2}_", text = xn)))
   
@@ -53,9 +57,12 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
                         filename = xn,
                         size = f.size,
                         recorder = id,
-                        date = date,
-                        time = format(dateTime, "%H:%M"),
-                        dateTime = dateTime,
+                        date_start = date,
+                        time_start = format(dateTime_start, "%H:%M"),
+                        dateTime_start = dateTime,
+                        date_end = date_end,
+                        time_end = format(dateTime_end, "%H:%M"),
+                        dateTime_end = dateTime_end,
                         x = NA,
                         y = NA,
                         duration = duration, ...)
