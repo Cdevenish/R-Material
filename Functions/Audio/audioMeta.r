@@ -85,7 +85,7 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   info.df[coord.ind,c("x", "y")] <- cbind(x.coord, y.coord)
   
   ## order by date
-  info.df <- info.df[order(info.df$dateTime_start),]
+  info.df <- info.df[order(info.df$dateTime_start, info.df$recorder),]
   
   #rm(date.text, time.text, coord.text, xycoords, coord.ind, x.coord, y.coord)
   
