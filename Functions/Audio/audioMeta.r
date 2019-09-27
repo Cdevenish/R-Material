@@ -42,10 +42,10 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   
   coord.ind <- grepl(pattern = "\\[", x = xn) # are coords included in filename?
   
-  date <- as.Date(date.text, format ="%Y%m%d")
-  dateTime <- strptime(paste(date.text, time.text), tz = tz, format = "%Y%m%d %H%M%S")
+  date_start <- as.Date(date.text, format ="%Y%m%d")
+  dateTime_start <- strptime(paste(date.text, time.text), tz = tz, format = "%Y%m%d %H%M%S")
   
-  dateTime_end <- dateTime + duration*60 # duration in minutes, so *60
+  dateTime_end <- dateTime_start + duration*60 # duration in minutes, so *60
   #date_end <- date + (duration/60) %/% 24  # duration in hours, as an integer division of 24
   date_end <- format(dateTime_end, "%Y%m%d") # maybe safer... 
   
@@ -57,9 +57,9 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
                         filename = xn,
                         size = f.size,
                         recorder = id,
-                        date_start = date,
+                        date_start = date_start,
                         time_start = format(dateTime_start, "%H:%M"),
-                        dateTime_start = dateTime,
+                        dateTime_start = dateTime_start,
                         date_end = date_end,
                         time_end = format(dateTime_end, "%H:%M"),
                         dateTime_end = dateTime_end,
