@@ -30,7 +30,8 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
     w <- w[!tryError.ind]
     dodgy.files <- x[tryError.ind]
     x <- x[!tryError.ind]
-    warning(paste(noErr, "wav files failed to read - possibly corrupt\nCheck these files:", dodgy.files))
+    warning(paste(noErr, "wav files failed to read - possibly corrupt. Check these files:\n", 
+                  paste(dodgy.files, collapse = "\n")))
     
   }
   
