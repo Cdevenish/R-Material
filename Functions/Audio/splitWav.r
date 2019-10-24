@@ -78,10 +78,25 @@ splitWav <- function(x,
   if(length(interval)==1 & is.numeric(interval)){
   
     duration <- duration/f # convert duration to units of interval
+
+    ## CHANGE THIS SO THAT DURATIONS OF LESS THAN duration ARE INCLUDED AS THEY ARE... Currently 
+    ## throws error
+    # this is one work round.. but better to change how the from and to are made... 
+    #
+    # duration <- duration/f # convert duration to units of interval
+    # 
+    # d_ind<-which(duration<=interval)
+    # duration<-duration[-d_ind]
+    # 
+    # x<-x[-d_ind]
+    # 
     
+        
     # Create vectors of sequences of starting and ending points (one vector for each filename)
     from <- lapply(duration, function(x) seq(0, x, interval)[-length(seq(0, x, interval))]) # minus end point
     to <- mapply(function(x, y) c(x[-1], y), from, duration, SIMPLIFY = F) # add on last point, take off first
+    
+  
     
     #all(lengths(from) == lengths(to))
     
