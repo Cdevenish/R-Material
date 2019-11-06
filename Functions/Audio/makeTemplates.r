@@ -5,7 +5,7 @@
 ## Function will match labels and sound files based on common filename, then extract templates for each 
 # labelled audio.
 
-makeTemplates <- function(path, tmptxt="TEMPLATE", dens=0.1, tz="Asia/Jakarta", labels=c("Audacity", "Raven"), ...){
+makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("Audacity", "Raven"), ...){
   
   library(tuneR) # to read waves in makeCorTemplate
   library(monitoR)
@@ -57,7 +57,7 @@ makeTemplates <- function(path, tmptxt="TEMPLATE", dens=0.1, tz="Asia/Jakarta", 
   #cbind(wavs.mtch, labs.fn)
   
   # get label info
-  labs <- read.audacity.lab(labs.fn)
+  labs <- read.audacity.lab(labs.fn) # returns a list
   # length(wavs.mtch) == length(labs)
   
   ## Make templates
