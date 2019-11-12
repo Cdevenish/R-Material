@@ -28,6 +28,8 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
   if(any(class(fn) %in% c("detectionList", "templateScores"))) { fn <- rep(fn@survey.name, nrow(x))}
   
   #dirname <- dirname(fn)
+  # get new filenames
+  new.fn <- vector(mode = "character", length = nrow(x))
   
   for(i in 1:nrow(x)){
     
@@ -44,12 +46,16 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
     if(missing(dir)) {
       
       new.file.name <- file.path(dirname(fn[i]), new.bn)} else {
+        
         new.file.name <- file.path(dir, new.bn)
       }
     
     tuneR::writeWave(tmp, filename = new.file.name, extensible = TRUE)
     
+    new.fn[i] <- new.file.name
     
   }
+  
+  invsible(data.frame(filename = fn, extract = new.fn))
   
 }

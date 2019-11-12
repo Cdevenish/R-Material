@@ -5,7 +5,7 @@
 # audio.df <- audioMeta(f)
 
 
-audioMeta <- function(x, tz = "Asia/Jakarta", ...){
+audioMeta <- function(x, tz = "Asia/Jakarta", sort = F, ...){
   
   library(tuneR)
   
@@ -17,6 +17,8 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   # 22_20181014_090035_Loreto_time [-15.2091 -64.7611].wav
   
   # tz is the time zone in format given by OlsonNames()
+  # sort. T F 
+  
   
   # get duration
   w <- lapply(x, function(z) try(readWave(z, header = T), silent = T))
@@ -70,6 +72,7 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   
   info.df <- data.frame(fileLoc = dirname(x), # file location
                         filename = xn,
+                        path = file.path(dirname(x), xn),
                         size = f.size,
                         recorder = id,
                         date_start = date_start,
@@ -85,7 +88,7 @@ audioMeta <- function(x, tz = "Asia/Jakarta", ...){
   info.df[coord.ind,c("x", "y")] <- cbind(x.coord, y.coord)
   
   ## order by date and start time
-  info.df <- info.df[order(info.df$dateTime_start),]
+  if(sort) info.df <- info.df[order(info.df$dateTime_start),]
   
   #rm(date.text, time.text, coord.text, xycoords, coord.ind, x.coord, y.coord)
   
