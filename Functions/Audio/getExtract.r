@@ -56,6 +56,7 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
     
   }
   
-  invisible(cbind(x, extract = new.fn))
+  # return the gdetect object with new columna for file extract, and filename
+  invisible(cbind(x, filename = fn, extract = new.fn, stringsAsFactors = F))
   
 }
