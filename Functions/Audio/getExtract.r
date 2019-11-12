@@ -56,6 +56,6 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
     
   }
   
-  invisible(data.frame(filename = fn, extract = new.fn))
+  invisible(cbind(x, extract = new.fn))
   
 }
