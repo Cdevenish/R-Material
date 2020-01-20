@@ -93,10 +93,13 @@ splitWav <- function(x,
     
         
     # Create vectors of sequences of starting and ending points (one vector for each filename)
-    from <- lapply(duration, function(x) seq(0, x, interval)[-length(seq(0, x, interval))]) # minus end point
-    to <- mapply(function(x, y) c(x[-1], y), from, duration, SIMPLIFY = F) # add on last point, take off first
+    from <- lapply(duration, function(x) seq(0, x, interval))
     
-  
+    # if duration divides exactly into interval, then take off last point
+    exact <- duration%%interval == 0
+    from <- mapply(function(x,y) if(y) x[-length(x)] else x, from, exact, SIMPLIFY = F)
+    
+    to <- mapply(function(x, y) c(x[-1], y), from, duration, SIMPLIFY = F) # add on last point, take off first
     
     #all(lengths(from) == lengths(to))
     
@@ -175,12 +178,14 @@ splitWav <- function(x,
     } # end of save loop
     
     
-  } else {
+    
+    
+  } else if(!is.numeric(interval)){
     
     ### NOT ADJUSTED FOR t.limits() yet... 
     
     if(class(interval) %in% c("POSIXt", "list", "character")){ # not so good, but for now...
-      
+    
       # initial check that the interval is specified in the correct format, ie HH:MM:SS, length 2, chr vector
       if(length(interval) == 2 & all(grepl("[[:digit:]]{2}\\:[[:digit:]]{2}\\:[[:digit:]]{2}$", x = interval))){
         

@@ -1,14 +1,18 @@
 ### adjust extent to nearest d value
 
-adjExt <- function(ext, d = 1000, expand = TRUE){
+adjExt <- function(ext, d = 1000, expand = TRUE, outF){
   
   ## ext is extent object as in,  sf::st_bbox or raster::extent()
   ## d is the value to which the extent should be rounded to, in spatial object units (eg m)
-  ## expand is whether to expand the extent to the nearest d, or shrink it. 
+  ## expand is whether to expand the extent to the nearest d, or shrink it.
+  ## outF controls format of returned exent. 'Extent' for raster::Extent class, 'bbox' for sf::st_bbox()
+  ## if missing, then output format follows input format of ext
   
   if(! class(ext) %in% c("Extent", "bbox")) stop("ext must be a sf bbox or raster extent object")
   
-  cls <- class(ext)
+  outF <- match.arg(outF, c("Extent", "bbox"))
+  
+  if(!missing(outF)) cls <- outF else cls <- class(ext)
   
   ext.std <- st_bbox(ext)
   
@@ -31,4 +35,4 @@ adjExt <- function(ext, d = 1000, expand = TRUE){
 }
 
 
-class(sp::bbox(ext))
+# class(sp::bbox(ext))

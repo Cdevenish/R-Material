@@ -1,18 +1,26 @@
 # 3.1 Convert coordinates ####
 
+# "+proj=utm +zone=17 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
 
-coordCon <- function(df=NULL, x="Lon", y="Lat", prjFROM="+proj=longlat +datum=WGS84", prjTO="+proj=utm +zone=17 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs"){
+
+coordCon <- function(df=NULL, x="Lon", y="Lat", prjFROM="+proj=longlat +datum=WGS84", prjTO, newXY){
+  
   # converts coordinates between projections
   # df is either a dataframe with named columns "x" and "y" (default "Lon" and "Lat")
   # or a vector c(x, y)
   # or coords are taken from clipboard - columns must be in order: x, y
   # prjFROM and prjTO are proj4 strings
-  require(rgdal)
-  require(sp)
   #WGS84 <- "+proj=longlat +datum=WGS84"
   #UTM17S <- "+proj=utm +zone=17 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs"
   
   # source w.xls # depends on this route being accessible if rows > 500
+  
+  require(rgdal)
+  require(sp)
+  library(sf)
+  
+  if(missing(newXY)) newXY <- c("prjx", "prjy")
+  
   
   cls <- class(df)
   if (!cls %in% c("data.frame", "numeric", "NULL")) stop("wrong input type - must be vector, dataframe or from clipboard")  ## TAKE COMILLAS OFF NULL?
@@ -37,7 +45,7 @@ coordCon <- function(df=NULL, x="Lon", y="Lat", prjFROM="+proj=longlat +datum=WG
   
   res <- data.frame(res)
   res[,4] <- NULL
-  colnames(res)[2:3] <- c("prjx", "prjy")
+  colnames(res)[2:3] <- newXY
   df.res <- merge(df, res, by = "ID", all = T)
   df.res$ID <- NULL
   
