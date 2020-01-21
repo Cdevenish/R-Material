@@ -10,7 +10,7 @@ templateCoincide <- function(x, round = 0, threshold, save.label = T, w){
   # x is getdetections object, or data frame with getdetections object, and filename as extra column
   # w is character vector to append to filenames if saving labels
   
-  if("filename" %in% colnames(x)) filenames <- T
+  if("filename" %in% colnames(x)) filenames <- T else filenames <- F
   
   # if no threshold, then use 60% of number of templates
   if(missing(threshold)) threshold <- ceiling(length(unique(x$template)) * 0.6)
