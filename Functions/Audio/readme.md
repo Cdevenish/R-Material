@@ -1,4 +1,4 @@
-# Function for audio analysis in R
+# Functions for audio analysis in R
 
 Most functions are for specific file types (e.g. processing .wav files from Frontier Labs BAR) or with monitoR package.
 

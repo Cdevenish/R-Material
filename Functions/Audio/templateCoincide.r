@@ -22,8 +22,11 @@ templateCoincide <- function(x, round = 0, threshold, save.label = T, w){
   
   #z <- length(split(x, x$filename))
   
-  if(filenames) tmp2 <- lapply(split(x, x$filename), 
-                               function(z) tapply(z$template, z$round.time, unique)) else {
+  if(filenames) {
+    
+    tmp2 <- lapply(split(x, x$filename), function(z) tapply(z$template, z$round.time, unique))
+    
+    } else {
     
     tmp2 <- list(tapply(x$template, x$round.time, unique))
   }
@@ -39,7 +42,7 @@ templateCoincide <- function(x, round = 0, threshold, save.label = T, w){
     res <- data.frame(start = as.numeric(names(z[ind])),
                       stop = as.numeric(names(z[ind])), 
                       count = count,
-                      label = unname(sapply(z[ind], paste, collapse = ",")))    
+                      label = unname(sapply(z[ind], paste, collapse = ","))) 
     
   })
   
