@@ -26,6 +26,10 @@ readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
   
   res <- do.call(rbind, labs.df)
   
+  ## Check minFreq maxFreq and timings.
+  
+  
+  
   # rename duplicate template names and keep original
   if(rename) {
     
