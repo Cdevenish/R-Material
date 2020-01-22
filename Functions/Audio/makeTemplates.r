@@ -69,7 +69,7 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels, ..
                       frq.lim = c(y[z,"minFreq"]/1000, y[z,"maxFreq"]/1000), 
                       name = y[z,"name"],
                       comment = y[z, "original"],
-                      dens = dens, ...)})
+                      dens = dens, plot = F, ...)})
   }, wavs.mtch, labs)
   
   ## TURN OFF PLOT?? 
