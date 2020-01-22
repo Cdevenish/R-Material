@@ -89,10 +89,28 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
   
   wavs.mtch <- wavs.fn[sapply(wav.ind, function(x) length(x) > 0)]
   
-  #cbind(wavs.mtch, labs.fn)
-  
   # get label info
   labs <- readLabels(labs.fn, type = labels) # returns a list
+  labs <- split(labs, labs$id)
+  
+  ## Match up label and wav files - put in same order
+  # Get reference call label filenames in
+  #labs.fn <- list.files(path = path, pattern = paste0(".*", tmptxt, "\\.txt$"), full.names = T, recursive = T)
+  
+  labs.fn <- names(labs)
+  
+  ## Get reference audio filenames 
+  wavs.fn <- list.files(path = path, pattern = "\\.wav$", full.names = T, recursive = T)
+  
+  # Match audio to labels
+  wavs.bn <- gsub(pattern = "\\.[[:alpha:]]{3}", "", basename(wavs.fn)) # get filenames without extensions
+  wav.ind <- lapply(wavs.bn, function(x) which(grepl(x, labs.fn, fixed = T))) # match to text label filenames
+  
+  wavs.mtch <- wavs.fn[sapply(wav.ind, function(x) length(x) > 0)]
+  
+  #cbind(wavs.mtch, labs.fn)
+  
+  
   # length(wavs.mtch) == length(labs)
   
   ## Make templates
