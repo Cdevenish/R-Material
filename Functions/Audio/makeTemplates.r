@@ -90,7 +90,7 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
   wavs.mtch <- wavs.fn[sapply(wav.ind, function(x) length(x) > 0)]
   
   # get label info
-  labs <- readLabels(labs.fn, type = labels) # returns a list
+  labs <- readLabels(labs.fn, type = labels) # returns a dataframe
   labs <- split(labs, labs$id)
   
   ## Match up label and wav files - put in same order
