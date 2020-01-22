@@ -24,18 +24,32 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
   ## labels = origin of labels..   Audacity, Raven.. generic dataframe... TODO
   
   ## function to read audacity labels:
-  read.audacity.lab <- function(x){
+  ## function to read audacity labels:
+  readLabels <- function(x, type = c("Audacity", "Raven")){
     
-    labs <- lapply(x, read.table, header = F, sep = "\t", stringsAsFactors= F)
-    labs.df <- lapply(labs, function(x) {
-      
-      e.ind <- seq(2,nrow(x),2)
-      o.ind <- seq(1,nrow(x),2)
-      
-      res <- cbind(x[o.ind,], x[e.ind, 2:3]) 
-      colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
-      res <- data.frame(name = res$name, lapply(res[-3], as.numeric), stringsAsFactors = F)
-    })
+    # x are file paths to label text files
+    # type is software used to create labels
+    type <- match.arg(type)
+    
+    labs.df <- switch(type, 
+                      
+                      Audacity = lapply(x, function(x) {
+                        
+                        labs <- read.table(x, header = F, sep = "\t", stringsAsFactors= F)
+                        
+                        e.ind <- seq(2,nrow(labs),2)
+                        o.ind <- seq(1,nrow(labs),2)
+                        
+                        res <- cbind(labs[o.ind,], labs[e.ind, 2:3]) 
+                        colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
+                        res <- data.frame(id  = basename(x), 
+                                          name = res$name, 
+                                          lapply(res[-3], as.numeric), 
+                                          stringsAsFactors = F)
+                      }),
+                      Raven = stop("Not implemented yet")
+    )
+    
     labs.df
   }
   
@@ -57,7 +71,7 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
   #cbind(wavs.mtch, labs.fn)
   
   # get label info
-  labs <- read.audacity.lab(labs.fn) # returns a list
+  labs <- readLabels(labs.fn) # returns a list
   # length(wavs.mtch) == length(labs)
   
   ## Make templates
@@ -67,6 +81,7 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
       makeCorTemplate(x, t.lim = c(y[z,"start"], y[z,"stop"]), 
                       frq.lim = c(y[z,"minFreq"]/1000, y[z,"maxFreq"]/1000), 
                       name = y[z,"name"],
+                      comment = y[z, "id"],
                       dens = dens, ...)})
   }, wavs.mtch, labs)
   
