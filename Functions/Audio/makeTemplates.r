@@ -24,25 +24,25 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
   ## labels = origin of labels..   Audacity, Raven.. generic dataframe... TODO
   
   ## function to read audacity labels:
-  ## function to read audacity labels:
-  readLabels <- function(x, type = c("Audacity", "Raven")){
-    
+  function(x, type = c("Audacity", "Raven"), rename = T){
+  
     # x are file paths to label text files
     # type is software used to create labels
+    
     type <- match.arg(type)
     
     labs.df <- switch(type, 
                       
-                      Audacity = lapply(x, function(x) {
+                      Audacity = lapply(x, function(y) {
                         
-                        labs <- read.table(x, header = F, sep = "\t", stringsAsFactors= F)
+                        labs <- read.table(y, header = F, sep = "\t", stringsAsFactors= F)
                         
                         e.ind <- seq(2,nrow(labs),2)
                         o.ind <- seq(1,nrow(labs),2)
                         
                         res <- cbind(labs[o.ind,], labs[e.ind, 2:3]) 
                         colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
-                        res <- data.frame(id  = basename(x), 
+                        res <- data.frame(id  = basename(y), 
                                           name = res$name, 
                                           lapply(res[-3], as.numeric), 
                                           stringsAsFactors = F)
@@ -50,7 +50,28 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
                       Raven = stop("Not implemented yet")
     )
     
-    labs.df
+    res <- do.call(rbind, labs.df)
+    
+    # rename duplicate template names and keep original
+    if(rename) {
+      
+      res <- res[order(res$name),]
+      
+      # check that names are dupicated
+      if(any(duplicated(res$name))) {
+        res$original <- res$name
+        
+        dups <- duplicated(res$name)
+        
+        
+        rn <- lapply(split(res$name, res$name), function(x) {
+          sapply(seq_along(x), function(y) paste(unique(x),y, sep ="_"))
+        })
+        res$name <- unname(unlist(rn))
+      }
+    }
+    
+    
   }
   
   ## function to read Raven labels... TO DO
@@ -71,7 +92,7 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
   #cbind(wavs.mtch, labs.fn)
   
   # get label info
-  labs <- readLabels(labs.fn) # returns a list
+  labs <- readLabels(labs.fn, type = labels) # returns a list
   # length(wavs.mtch) == length(labs)
   
   ## Make templates

@@ -1,5 +1,4 @@
-## function to read audacity labels:
-readLabels <- function(x, type = c("Audacity", "Raven")){
+function(x, type = c("Audacity", "Raven"), rename = T){
   
   
   # x are file paths to label text files
@@ -9,22 +8,22 @@ readLabels <- function(x, type = c("Audacity", "Raven")){
   
   labs.df <- switch(type, 
                     
-        Audacity = lapply(x, function(x) {
-          
-        labs <- read.table(x, header = F, sep = "\t", stringsAsFactors= F)
+                    Audacity = lapply(x, function(y) {
                       
-        e.ind <- seq(2,nrow(labs),2)
-        o.ind <- seq(1,nrow(labs),2)
+                      labs <- read.table(y, header = F, sep = "\t", stringsAsFactors= F)
                       
-        res <- cbind(labs[o.ind,], labs[e.ind, 2:3]) 
-        colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
-        res <- data.frame(id  = basename(x), 
-                          name = res$name, 
-                          lapply(res[-3], as.numeric), 
-                          stringsAsFactors = F)
-        }),
-        Raven = stop("Not implemented yet")
-          )
+                      e.ind <- seq(2,nrow(labs),2)
+                      o.ind <- seq(1,nrow(labs),2)
+                      
+                      res <- cbind(labs[o.ind,], labs[e.ind, 2:3]) 
+                      colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
+                      res <- data.frame(id  = basename(y), 
+                                        name = res$name, 
+                                        lapply(res[-3], as.numeric), 
+                                        stringsAsFactors = F)
+                    }),
+                    Raven = stop("Not implemented yet")
+  )
   
   res <- do.call(rbind, labs.df)
   
@@ -43,7 +42,7 @@ readLabels <- function(x, type = c("Audacity", "Raven")){
       rn <- lapply(split(res$name, res$name), function(x) {
         sapply(seq_along(x), function(y) paste(unique(x),y, sep ="_"))
       })
-      res$name <- unlist(rn)
+      res$name <- unname(unlist(rn))
     }
   }
   
