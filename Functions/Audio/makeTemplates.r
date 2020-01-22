@@ -5,7 +5,7 @@
 ## Function will match labels and sound files based on common filename, then extract templates for each 
 # labelled audio.
 
-makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("Audacity", "Raven"), ...){
+makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels, ...){
   
   library(tuneR) # to read waves in makeCorTemplate
   library(monitoR)
@@ -21,80 +21,29 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
   # dens - density (pixel resolution of sonogram) at which to create templates
   # tz - time zone of audio data
   
-  ## labels = origin of labels..   Audacity, Raven.. generic dataframe... TODO
+  ## labels, if present, a data frame with label info, otherwise will be taken from path
   
-  ## function to read audacity labels:
-  readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
   
-    # x are file paths to label text files
-    # type is software used to create labels
+  if(missing(labels)){
     
-    type <- match.arg(type)
-    
-    labs.df <- switch(type, 
-                      
-                      Audacity = lapply(x, function(y) {
-                        
-                        labs <- read.table(y, header = F, sep = "\t", stringsAsFactors= F)
-                        
-                        e.ind <- seq(2,nrow(labs),2)
-                        o.ind <- seq(1,nrow(labs),2)
-                        
-                        res <- cbind(labs[o.ind,], labs[e.ind, 2:3]) 
-                        colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
-                        res <- data.frame(id  = basename(y), 
-                                          name = res$name, 
-                                          lapply(res[-3], as.numeric), 
-                                          stringsAsFactors = F)
-                      }),
-                      Raven = stop("Not implemented yet")
-    )
-    
-    res <- do.call(rbind, labs.df)
-    
-    # rename duplicate template names and keep original
-    if(rename) {
-      
-      res <- res[order(res$name),]
-      
-      # check that names are dupicated
-      if(any(duplicated(res$name))) {
-        res$original <- res$name
-        
-        rn <- lapply(split(res$name, res$name), function(x) {
-          sapply(seq_along(x), function(y) paste(unique(x),y, sep ="_"))
-        })
-        res$name <- unname(unlist(rn))
-      }
-    }
-    
-    res
-    
+    ## function to read audacity labels:
+    source("https://raw.githubusercontent.com/Cdevenish/R-Material/master/Functions/Audio/readLabels.r")
+  
+    # get label info
+    labs.fn <- list.files(path = path, pattern = paste0(".*", tmptxt, "\\.txt$"), 
+                        full.names = T, recursive = T)
+  
+    labels <- readLabels(labs.fn) # returns a dataframe
+  } else if(class(labels) != "data.frame" |
+            any(!c("id", "start", "stop", "minFreq", "maxFreq", "name") %in% colnames(labels))) {
+    stop("labels must be a data frame, with columns: id, start, stop, minFreq, maxFreq, names")
   }
   
-  ## function to read Raven labels... TO DO
-  
-  
-  ## Get reference call label filenames in
-  labs.fn <- list.files(path = path, pattern = paste0(".*", tmptxt, "\\.txt$"), full.names = T, recursive = T)
-  
-  ## Get reference audio filenames 
-  wavs.fn <- list.files(path = path, pattern = "\\.wav$", full.names = T, recursive = T)
-  
-  # Match audio to labels
-  wavs.bn <- gsub(pattern = "\\.[[:alpha:]]{3}", "", basename(wavs.fn)) # get filenames without extensions
-  wav.ind <- lapply(wavs.bn, function(x) which(grepl(x, labs.fn, fixed = T))) # match to text label filenames
-  
-  wavs.mtch <- wavs.fn[sapply(wav.ind, function(x) length(x) > 0)]
-  
-  # get label info
-  labs <- readLabels(labs.fn, type = labels) # returns a dataframe
-  labs <- split(labs, labs$id)
+  labs <- split(labels, labs$id)
   
   ## Match up label and wav files - put in same order
-  # Get reference call label filenames in
-  #labs.fn <- list.files(path = path, pattern = paste0(".*", tmptxt, "\\.txt$"), full.names = T, recursive = T)
   
+  # template filenames
   labs.fn <- names(labs)
   
   ## Get reference audio filenames 
