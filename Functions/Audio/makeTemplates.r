@@ -121,7 +121,7 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
       makeCorTemplate(x, t.lim = c(y[z,"start"], y[z,"stop"]), 
                       frq.lim = c(y[z,"minFreq"]/1000, y[z,"maxFreq"]/1000), 
                       name = y[z,"name"],
-                      comment = y[z, "id"],
+                      comment = y[z, "original"],
                       dens = dens, ...)})
   }, wavs.mtch, labs)
   
