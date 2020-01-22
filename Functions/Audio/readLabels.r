@@ -45,5 +45,6 @@ readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
     }
   }
   
+  res
   
 }

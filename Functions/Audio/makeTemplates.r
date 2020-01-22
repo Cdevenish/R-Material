@@ -71,6 +71,7 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
       }
     }
     
+    res
     
   }
   
