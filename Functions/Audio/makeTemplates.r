@@ -34,12 +34,13 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels, ..
                         full.names = T, recursive = T)
   
     labels <- readLabels(labs.fn) # returns a dataframe
+    
   } else if(class(labels) != "data.frame" |
             any(!c("id", "start", "stop", "minFreq", "maxFreq", "name") %in% colnames(labels))) {
     stop("labels must be a data frame, with columns: id, start, stop, minFreq, maxFreq, names")
   }
   
-  labs <- split(labels, labs$id)
+  labs <- split(labels, labels$id)
   
   ## Match up label and wav files - put in same order
   
