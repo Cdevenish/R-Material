@@ -1,5 +1,5 @@
 ## function to read audacity labels:
-read.audacity.lab <- function(x, type = c("Audacity", "Raven")){
+readLabels <- function(x, type = c("Audacity", "Raven")){
   
   
   # x are file paths to label text files
