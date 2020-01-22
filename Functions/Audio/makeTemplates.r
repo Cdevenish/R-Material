@@ -61,9 +61,6 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
       if(any(duplicated(res$name))) {
         res$original <- res$name
         
-        dups <- duplicated(res$name)
-        
-        
         rn <- lapply(split(res$name, res$name), function(x) {
           sapply(seq_along(x), function(y) paste(unique(x),y, sep ="_"))
         })
