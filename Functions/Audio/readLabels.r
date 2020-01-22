@@ -26,5 +26,26 @@ readLabels <- function(x, type = c("Audacity", "Raven")){
         Raven = stop("Not implemented yet")
           )
   
-  labs.df
+  res <- do.call(rbind, labs.df)
+  
+  # rename duplicate template names and keep original
+  if(rename) {
+    
+    res <- res[order(res$name),]
+    
+    # check that names are dupicated
+    if(any(duplicated(res$name))) {
+      res$original <- res$name
+      
+      dups <- duplicated(res$name)
+      
+      
+      rn <- lapply(split(res$name, res$name), function(x) {
+        sapply(seq_along(x), function(y) paste(unique(x),y, sep ="_"))
+      })
+      res$name <- unlist(rn)
+    }
+  }
+  
+  
 }
