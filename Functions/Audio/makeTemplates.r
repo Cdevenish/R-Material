@@ -24,7 +24,7 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels=c("
   ## labels = origin of labels..   Audacity, Raven.. generic dataframe... TODO
   
   ## function to read audacity labels:
-  function(x, type = c("Audacity", "Raven"), rename = T){
+  readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
   
     # x are file paths to label text files
     # type is software used to create labels
