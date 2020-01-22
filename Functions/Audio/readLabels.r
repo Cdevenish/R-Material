@@ -6,7 +6,7 @@ readLabels <- function(x, type = c("Audacity", "Raven")){
   # type is software used to create labels
   
   
-  type <- match.args(type)
+  type <- match.arg(type)
   
   labs <- lapply(x, read.table, header = F, sep = "\t", stringsAsFactors= F)
   
