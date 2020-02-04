@@ -5,7 +5,7 @@
 ## Function will match labels and sound files based on common filename, then extract templates for each 
 # labelled audio.
 
-makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels, ...){
+makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels, exact = T, ...){
   
   library(tuneR) # to read waves in makeCorTemplate
   library(monitoR)
@@ -52,7 +52,21 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels, ..
   
   # Match audio to labels
   wavs.bn <- gsub(pattern = "\\.[[:alpha:]]{3}", "", basename(wavs.fn)) # get filenames without extensions
-  wav.ind <- lapply(wavs.bn, function(x) which(grepl(x, labs.fn, fixed = T))) # match to text label filenames
+  
+  if(exact){
+    
+    # get only exact matches of label filenames in wav filenames
+    wav.ind <- lapply(wavs.bn, function(x) which(x == labs.fn))
+    
+  } else {
+    
+    # match to text label filenames - which wav filenames contains text from label files?
+    wav.ind <- lapply(wavs.bn, function(x) which(grepl(x, labs.fn, fixed = T)))
+    
+    
+  }
+  
+  
   
   wavs.mtch <- wavs.fn[sapply(wav.ind, function(x) length(x) > 0)]
   
