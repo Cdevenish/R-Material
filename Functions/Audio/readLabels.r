@@ -39,7 +39,7 @@ readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
   outFreq <- res[!ind,]
   
   ## and for misclasified times
-  ind2 <- res[,"start"] >= x[,"stop"]
+  ind2 <- res[,"start"] >= res[,"stop"]
   
   # remove misclassified
   res <- res[ind2,]
