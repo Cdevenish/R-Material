@@ -1,3 +1,11 @@
+
+## Reads audacity label files
+
+# testing
+# type = "Audacity"
+# rename = T
+
+
 readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
   
   # x are file paths to label text files
@@ -27,11 +35,13 @@ readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
   )
   
   res <- do.call(rbind, labs.df) ## produces a data frame
+  # head(res)
   
-  ## Check minFreq maxFreq and timings.
+  ## Check minFreq maxFreq and timings for mistakes
   
   ## check frequencies - for misclassified freqs
-  ind <- res[,"minFreq"] >= res[,"maxFreq"]
+  ind <- res[,"minFreq"] <= res[,"maxFreq"] # sum(ind)
+  
   # remove
   res <- res[ind,]
   
@@ -39,13 +49,13 @@ readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
   outFreq <- res[!ind,]
   
   ## and for misclasified times
-  ind2 <- res[,"start"] >= res[,"stop"]
+  ind2 <- res[,"start"] <= res[,"stop"] # sum(ind2)
   
   # remove misclassified
   res <- res[ind2,]
   outTimes <- res[!ind2,]
   
-  if(any(c(ind, ind2))){
+  if(any(!c(ind, ind2))){
     out <- rbind(outFreq, outTimes)
     warning(paste0("Frequency/Time mismatch in ", nrow(out), " labels"))
   }
