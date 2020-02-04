@@ -2,6 +2,8 @@ readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
   
   # x are file paths to label text files
   # type is software used to create labels
+  # renames .
+  #
   
   type <- match.arg(type)
   
@@ -24,9 +26,48 @@ readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
                     Raven = stop("Not implemented yet")
   )
   
-  res <- do.call(rbind, labs.df)
+  res <- do.call(rbind, labs.df) ## produces a data frame
   
   ## Check minFreq maxFreq and timings.
+  
+  ## check frequencies - for misclassified freqs
+  ind <- res[,"minFreq"] >= res[,"maxFreq"]
+  # remove
+  res <- res[ind,]
+  
+  # get data frame of mismatched freqs
+  outFreq <- res[!ind,]
+  
+  ## and for misclasified times
+  ind2 <- res[,"start"] >= x[,"stop"]
+  
+  # remove misclassified
+  res <- res[ind2,]
+  outTimes <- res[!ind2,]
+  
+  if(any(c(ind, ind2))){
+    out <- rbind(outFreq, outTimes)
+    warning(paste0("Frequency/Time mismatch in ", nrow(out), " labels"))
+  }
+  
+  
+  ## filter for required names
+  # if(!missing(namesUse)) {
+  #   
+  #   # could check here whether namesUSe match anything at all?
+  #   res <- subset(res, name %in% namesUse)
+  #   
+  # }
+  # 
+  ## check no template label files have ended up with no rows in the res df
+  ind3 <- basename(x) %in% unique(res$id)
+  
+  if(any(!ind3)) {
+    
+    warning(paste0(sum(ind3), "label files have no valid labels:\n", basename(x)[!ind3]))
+    
+  }
+  
   
   
   
