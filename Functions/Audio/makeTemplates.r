@@ -52,16 +52,18 @@ makeTemplates <- function(path, tmptxt="", dens=1, tz="Asia/Jakarta", labels, ex
   
   # Match audio to labels
   wavs.bn <- gsub(pattern = "\\.[[:alpha:]]{3}", "", basename(wavs.fn)) # get filenames without extensions
+  labs.bn <- gsub(pattern = "\\.[[:alpha:]]{3}", "", basename(labs.fn)) # get filenames without extensions
+  
   
   if(exact){
     
     # get only exact matches of label filenames in wav filenames
-    wav.ind <- lapply(wavs.bn, function(x) which(x == labs.fn))
+    wav.ind <- lapply(wavs.bn, function(x) which(x == labs.bn))
     
   } else {
     
     # match to text label filenames - which wav filenames contains text from label files?
-    wav.ind <- lapply(wavs.bn, function(x) which(grepl(x, labs.fn, fixed = T)))
+    wav.ind <- lapply(wavs.bn, function(x) which(grepl(x, labs.bn, fixed = T)))
     
     
   }
