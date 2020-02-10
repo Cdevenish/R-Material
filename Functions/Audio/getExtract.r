@@ -1,10 +1,10 @@
-### Function to get mp3 xtracts from a gdetects object
+### Function to get wav or mp3 extracts from a gdetects object
 
 
 ## TO DO>..  change file name with new start time... 
 
 
-getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app){
+getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app, label){
   
   
   library(tuneR)
@@ -15,6 +15,7 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app){
   # format for exported audio extract, - only wav at the moment
   # dir - directory for extract, if missing, working directory is used.
   # app is a character vector of length 1, to append to extract filenames
+  # label is colname of x, or vector of names to append to extract filename, eg species name
   
   # # edit file name - insert new start time and section number
   # newStartTime <- dateTime.start[i] + from[i] * f
@@ -23,6 +24,16 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app){
   
   if(!all(length(app)==1,is.character(app))) stop("app must be a character vector of length 1")
   if(missing(app)) app <- NULL
+  
+  if(!is.null(label) & is.character(label)){
+    
+    if(length(label) == 1) labs <- x[,label] else {
+      
+      if(length(label) == nrow(x)) labs <- label} else stop("Label must be same length as x")
+    
+    
+  } else stop("label must be a character vector")
+  
   
   from <- x$time - buffer
   to <- x$time + buffer
@@ -40,7 +51,13 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app){
     tmp <- tuneR::readWave(fn[i], from[i], to[i], units = "seconds")
     
     new.bn <- basename(fn[i])
-    new.bn <- sub("\\.wav$", sprintf("_%s_extr%02d.wav",app, i), new.bn)
+    
+    if(label) {
+      new.bn <- sub("\\.wav$", sprintf("_%s_%s_extr%02d.wav",app, x[i,label], i), new.bn)
+      } else {
+        new.bn <- sub("\\.wav$", sprintf("_%s_extr%02d.wav",app, i), new.bn)
+      }
+    
     
     #newStartTime <- dateTime.start[i] + from[i] * f
     # new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
