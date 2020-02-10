@@ -4,7 +4,7 @@
 ## TO DO>..  change file name with new start time... 
 
 
-getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
+getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app){
   
   
   library(tuneR)
@@ -14,11 +14,15 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
   # buffer is time in seconds on either side of detection hit time
   # format for exported audio extract, - only wav at the moment
   # dir - directory for extract, if missing, working directory is used.
+  # app is a character vector of length 1, to append to extract filenames
   
   # # edit file name - insert new start time and section number
   # newStartTime <- dateTime.start[i] + from[i] * f
   # new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
   # new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
+  
+  if(!all(length(app)==1,is.character(app))) stop("app must be a character vector of length 1")
+  if(missing(app)) app <- NULL
   
   from <- x$time - buffer
   to <- x$time + buffer
@@ -36,7 +40,7 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir){
     tmp <- tuneR::readWave(fn[i], from[i], to[i], units = "seconds")
     
     new.bn <- basename(fn[i])
-    new.bn <- sub("\\.wav$", sprintf("_extract%02d.wav",i), new.bn)
+    new.bn <- sub("\\.wav$", sprintf("_%s_extr%02d.wav",app, i), new.bn)
     
     #newStartTime <- dateTime.start[i] + from[i] * f
     # new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
