@@ -27,12 +27,9 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app, la
   
   if(!is.null(label) & is.character(label)){
     
-    if(length(label) == 1) labs <- x[,label] else {
-      
-      if(length(label) == nrow(x)) labs <- label} else stop("Label must be same length as x")
+    if(length(label) == 1) labs <- x[,label] else if(length(label) == nrow(x)) labs <- label
     
-    
-  } else stop("label must be a character vector")
+    } else stop("label must be a character vector of length 1 or same length as x")
   
   
   from <- x$time - buffer
@@ -52,8 +49,8 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app, la
     
     new.bn <- basename(fn[i])
     
-    if(label) {
-      new.bn <- sub("\\.wav$", sprintf("_%s_%s_extr%02d.wav",app, x[i,label], i), new.bn)
+    if(!missing(label)) {
+      new.bn <- sub("\\.wav$", sprintf("_%s_%s_extr%02d.wav",app, labs[i], i), new.bn)
       } else {
         new.bn <- sub("\\.wav$", sprintf("_%s_extr%02d.wav",app, i), new.bn)
       }
