@@ -13,14 +13,16 @@ readLabels <- function(x, type, rename = T){
   # renames is to rename each template with unique id within name (eg. in species)
   #
   
-  type <- match.arg(type)
+  #type <- c("Audacity", "Raven")
+  #
   
   if(missing(type) | is.null(type)){
     
         type <- sapply(x, function(y) {
           ifelse(substr(readLines(y, 1, warn = F), 1,5) == "Selec", "Raven", "Audacity")
         })
-  }
+  } else type <- match.arg(type)
+  
   # table(type)
   if(!length(type) %in% c(1, length(x))) stop("Check label files")
   
