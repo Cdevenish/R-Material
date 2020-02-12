@@ -6,36 +6,76 @@
 # rename = T
 
 
-readLabels <- function(x, type = c("Audacity", "Raven"), rename = T){
+readLabels <- function(x, type, rename = T){
   
   # x are file paths to label text files
-  # type is software used to create labels
-  # renames .
+  # type is software used to create labels ie one of c("Audacity", "Raven")
+  # renames is to rename each template with unique id within name (eg. in species)
   #
   
   type <- match.arg(type)
   
-  labs.df <- switch(type, 
+  if(missing(type) | is.null(type)){
+    
+        type <- sapply(x, function(y) {
+          ifelse(substr(readLines(y, 1, warn = F), 1,5) == "Selec", "Raven", "Audacity")
+        })
+  }
+  # table(type)
+  if(!length(type) %in% c(1, length(x))) stop("Check label files")
+  
+  
+  audacity.read <- function(x){
+    
+    labs <- read.table(x, header = F, sep = "\t", stringsAsFactors= F)
+    e.ind <- seq(2,nrow(labs),2)
+    o.ind <- seq(1,nrow(labs),2)
+    
+    res <- cbind(labs[o.ind,], labs[e.ind, 2:3]) 
+    colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
+    res <- data.frame(id  = basename(x), 
+                      name = res$name, 
+                      lapply(res[-3], as.numeric), 
+                      stringsAsFactors = F)
+  }
+  
+  raven.read <- function(x) {
+    
+    labs <- read.table(x, header = T, sep = "\t", stringsAsFactors = F)
+    res <- labs[,c("Begin.Time..s.","End.Time..s.", 
+                   "Low.Freq..Hz.", "High.Freq..Hz.", "Annotation")]
+    colnames(res) <- c("start", "stop", "minFreq", "maxFreq", "name")
+    res <- data.frame(id  = basename(x), 
+                      name = res$name, 
+                      res[,c(1:4)], 
+                      stringsAsFactors = F)
+    
+  }
+  
+  if(length(type) == 1){
+    
+    labs.df <- switch(type, 
                     
-                    Audacity = lapply(x, function(y) {
-                      
-                      labs <- read.table(y, header = F, sep = "\t", stringsAsFactors= F)
-                      
-                      e.ind <- seq(2,nrow(labs),2)
-                      o.ind <- seq(1,nrow(labs),2)
-                      
-                      res <- cbind(labs[o.ind,], labs[e.ind, 2:3]) 
-                      colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
-                      res <- data.frame(id  = basename(y), 
-                                        name = res$name, 
-                                        lapply(res[-3], as.numeric), 
-                                        stringsAsFactors = F)
-                    }),
-                    Raven = stop("Not implemented yet")
-  )
+                    Audacity = lapply(x, audacity.read),
+                    Raven = lapply(x, raven.read)
+                    )
+      } else {
+        
+        labs.df <- mapply(function(z,w) {
+          
+          switch(z, 
+                 
+                 Audacity = audacity.read(w),
+                 Raven = raven.read(w)
+          )}, type, x, SIMPLIFY = F)
+    
+      }
+  
+  # head(labs.df)
   
   res <- do.call(rbind, labs.df) ## produces a data frame
-  # head(res)
+  rownames(res) <- NULL
+  # head(res); tail(res)
   
   ## Check minFreq maxFreq and timings for mistakes
   
