@@ -6,6 +6,11 @@
 # rename = T
 
 
+## TODO 
+## at moment, errors are sequential. eg if removed for frq erros, then won't show up in name errors.
+## Change res names so that error checking is indiependent. for now with repeated rows in out
+
+
 readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
   
   # x are file paths to label text files
