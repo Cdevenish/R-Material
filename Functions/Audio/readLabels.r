@@ -46,7 +46,8 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
     
     res <- cbind(labs[o.ind,], labs[e.ind, 2:3]) 
     colnames(res) <- c("start", "stop", "name", "minFreq", "maxFreq")
-    res <- data.frame(id  = basename(x), 
+    res <- data.frame(path = x,
+                      id  = basename(x), 
                       name = res$name, 
                       lapply(res[-3], as.numeric), 
                       stringsAsFactors = F)
@@ -58,7 +59,8 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
     res <- labs[,c("Begin.Time..s.","End.Time..s.", 
                    "Low.Freq..Hz.", "High.Freq..Hz.", "Annotation")]
     colnames(res) <- c("start", "stop", "minFreq", "maxFreq", "name")
-    res <- data.frame(id  = basename(x), 
+    res <- data.frame(path = x,
+                      id  = basename(x), 
                       name = res$name, 
                       res[,c(1:4)], 
                       stringsAsFactors = F)
