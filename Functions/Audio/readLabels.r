@@ -16,7 +16,7 @@ readLabels <- function(x, type, rename = T){
   #type <- c("Audacity", "Raven")
   #
   
-  if(missing(type) | is.null(type)){
+  if(missing(type)){
     
         type <- sapply(x, function(y) {
           ifelse(substr(readLines(y, 1, warn = F), 1,5) == "Selec", "Raven", "Audacity")
