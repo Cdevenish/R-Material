@@ -6,12 +6,18 @@
 # rename = T
 
 
-readLabels <- function(x, type, rename = T){
+readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
   
   # x are file paths to label text files
   # type is software used to create labels ie one of c("Audacity", "Raven")
   # renames is to rename each template with unique id within name (eg. in species)
   #
+  # names2match is optional character vector of (species) names/codes to match exactly with label name.
+  # If names do not match a warning is given, showing where they do not match.
+  
+  # includeErrors - logical. if T, then a list is returned with first element a data frame with 
+  # label info, and a second element with errors in freq/time/name filters
+  # NOTE this argument changes the class and length of the returned object.
   
   #type <- c("Audacity", "Raven")
   #
@@ -81,25 +87,52 @@ readLabels <- function(x, type, rename = T){
   
   ## Check minFreq maxFreq and timings for mistakes
   
+  ## Freq filter
   ## check frequencies - for misclassified freqs
-  ind <- res[,"minFreq"] <= res[,"maxFreq"] # sum(ind)
-  
-  # remove
-  res <- res[ind,]
+  ind <- res[,"minFreq"] <= res[,"maxFreq"] 
+  # sum(ind)
   
   # get data frame of mismatched freqs
   outFreq <- res[!ind,]
   
+  # remove from results
+  res <- res[ind,]
+  
+  # TIME FILTER
   ## and for misclasified times
-  ind2 <- res[,"start"] <= res[,"stop"] # sum(ind2)
+  ind2 <- res[,"start"] <= res[,"stop"] # sum(!ind2)
+  
+  #sum(ind2) == nrow(res)
+  outTimes <- res[!ind2,]
   
   # remove misclassified
   res <- res[ind2,]
-  outTimes <- res[!ind2,]
   
-  if(any(!c(ind, ind2))){
-    out <- rbind(outFreq, outTimes)
-    warning(paste0("Frequency/Time mismatch in ", nrow(out), " labels"))
+  ## Name filter
+  if(!missing(names2match)){
+    
+    if(class(names2match) != "character") stop("names2match must be a character vector")
+    namesData <- unique(res[,"name"])
+    ind3 <- !namesData %in% names2match
+    namesMismatch <- namesData[ind3]
+    
+    outNames <- res[res[, "name"] %in% namesMismatch, ]
+  
+    
+    # remove from results
+    res <- res[!res[, "name"] %in% namesMismatch, ]
+    
+    # sum(ind3)
+  }
+  
+  
+  if(any(!c(ind, ind2, ind3))){
+    out <- rbind(outFreq, outTimes, outNames)
+    out$type <- rep(c("Frequency mismatch", "Time mismatch", "Name mismatch"), 
+                    c(nrow(outFreq), nrow(outTimes), nrow(outNames)))
+    
+    warning(paste0("Frequency/Time/Name mismatch in ", nrow(out), " labels.\n"))
+    #print(out)
   }
   
   
@@ -112,12 +145,12 @@ readLabels <- function(x, type, rename = T){
   # }
   # 
   ## check no template label files have ended up with no rows in the res df
-  ind3 <- basename(x) %in% unique(res$id)
+  ind4 <- basename(x) %in% unique(res$id)
+  # sum(!ind3)
   
-  if(any(!ind3)) {
-    
-    warning(paste0(sum(ind3), "label files have no valid labels:\n", basename(x)[!ind3]))
-    
+  if(any(!ind4)) {
+    warning(paste0(sum(!ind4), " label files have no valid labels after filtering.\n"))
+    #print(paste(basename(x)[!ind4], sep = "\n"))
   }
   
   
@@ -139,6 +172,11 @@ readLabels <- function(x, type, rename = T){
     }
   }
   
-  res
+  
+  if(includeErrors){
+    
+    return(list(res, out))
+    
+  } else return(res)
   
 }
