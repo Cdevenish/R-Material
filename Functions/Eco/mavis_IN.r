@@ -1,8 +1,5 @@
 ### Function to read txt files output from MAVIS ####
 
-fn <- "mavis/MAVIS out NVC constancy.TXT"
-idCol <- "unID"
-
 mavis_IN <- function(fn, idCol, group = T){
   
   # fn - full path to file (a text file)
