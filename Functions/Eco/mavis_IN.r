@@ -108,11 +108,14 @@ mavis_IN <- function(fn, idCol, group = T, type = c("NVC", "ELL")){
       
       csr.regex <- "CSR:\\sC:\\s([[:digit:]]+\\.[[:digit:]]*)\\s{1,}S:\\s([[:digit:]]+\\.[[:digit:]]*)\\s{1,}R:\\s([[:digit:]]+\\.[[:digit:]]*)"
       
+      # -1.#J  when no CSR data.. this is converted to NA by as.numeric. Suppressing warning to avoid
+      # a warning about this.
+      
       csr <- x[grepl("CSR", x)]
       csr.spp <- sub("CSR:.*species.with.no.data:\\s(.*)", "\\1", csr[1])
-      C <- as.numeric(sub(csr.regex, "\\1", csr[2]))
-      S <- as.numeric(sub(csr.regex, "\\2", csr[2]))
-      R <- as.numeric(sub(csr.regex, "\\3", csr[2]))
+      C <- suppressWarnings(as.numeric(sub(csr.regex, "\\1", csr[2])))
+      S <- suppressWarnings(as.numeric(sub(csr.regex, "\\2", csr[2])))
+      R <- suppressWarnings(as.numeric(sub(csr.regex, "\\3", csr[2])))
       list(csr.spp, cbind(C, S, R))
     })
     
