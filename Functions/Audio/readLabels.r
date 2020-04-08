@@ -4,7 +4,7 @@
 # testing
 # type = "Audacity"
 # rename = T
-
+# includeErrors = T
 
 ## TODO 
 ## at moment, errors are sequential. eg if removed for frq erros, then won't show up in name errors.
