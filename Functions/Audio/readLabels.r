@@ -67,6 +67,8 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
     
   }
   
+  ## OJO INLCULDE try() in here:
+  
   if(length(type) == 1){
     
     labs.df <- switch(type, 
@@ -130,18 +132,29 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
     res <- res[!res[, "name"] %in% namesMismatch, ]
     
     # sum(ind3)
-  }
-  
-  
-  if(any(!c(ind, ind2, ind3))){
-    out <- rbind(outFreq, outTimes, outNames)
-    out$type <- rep(c("Frequency mismatch", "Time mismatch", "Name mismatch"), 
-                    c(nrow(outFreq), nrow(outTimes), nrow(outNames)))
     
-    warning(paste0("Frequency/Time/Name mismatch in ", nrow(out), " labels.\n"))
-    #print(out)
+    if(any(!c(ind, ind2, ind3))){
+      out <- rbind(outFreq, outTimes, outNames)
+      out$type <- rep(c("Frequency mismatch", "Time mismatch", "Name mismatch"), 
+                      c(nrow(outFreq), nrow(outTimes), nrow(outNames)))
+      
+      warning(paste0("Frequency/Time/Name mismatch in ", nrow(out), " labels.\n"))
+      #print(out)
+    }
+    
+    
+  } else {
+    
+    if(any(!c(ind, ind2))){
+      out <- rbind(outFreq, outTimes)
+      out$type <- rep(c("Frequency mismatch", "Time mismatch"), 
+                      c(nrow(outFreq), nrow(outTimes)))
+      
+      warning(paste0("Frequency/Time mismatch in ", nrow(out), " labels.\n"))
+      #print(out)
+    }  
+    
   }
-  
   
   ## filter for required names
   # if(!missing(namesUse)) {
@@ -170,6 +183,10 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
     
     # check that names are dupicated
     if(any(duplicated(res$name))) {
+      
+      # sum(is.na(res$name))
+      # deal with NAs here... dropped by split, then rows do not add up... 
+      res$name[is.na(res$name)] <- "NAX"
       res$original <- res$name
       
       rn <- lapply(split(res$name, res$name), function(x) {
@@ -179,6 +196,7 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
     }
   }
   
+  # sum(lengths(rn))
   
   if(includeErrors){
     
