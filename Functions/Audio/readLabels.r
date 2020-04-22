@@ -185,8 +185,8 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
     if(any(duplicated(res$name))) {
       
       # sum(is.na(res$name))
-      # deal with NAs here... dropped by split, then rows do not add up... 
-      res$name[is.na(res$name)] <- "NAX"
+      # deal with NAs here... dropped by split below, then rows do not add up... so need to rename
+      res$name[is.na(res$name)] <- "Unknown"
       res$original <- res$name
       
       rn <- lapply(split(res$name, res$name), function(x) {
