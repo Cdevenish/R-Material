@@ -13,7 +13,8 @@ wavCheck <- function(fn, samp =44100, duration = 5, channels = 1, bits = 16, rm 
   # Channels are the required number of channels (or NULL not to test)
   # bits are the required bit depth of the wav (or NULL not to test)
   # rm. Logical , return vector of filepaths without those with duration < duration, and with 
-  # sample rates not equal to samp
+  # sample rates not equal to samp. Otherwise will return a data frame with results of check.  With columns 
+  # equal to the samp, duration, chaqnnel, bits that are not null
   
   # Check libraries av tuneR
   
@@ -45,15 +46,23 @@ wavCheck <- function(fn, samp =44100, duration = 5, channels = 1, bits = 16, rm 
   if(!missing(fix)) {
     
     if(!dir.exists(fix)) stop("fix must be a valid directory to store the reprocessed files")
+    if(is.null(duration) & is.null(channels)) stop("samp and/or channels must be present for reprocessing option")
     
-    outFiles <- file.path(fix, basename(fn))
+    sav <- c("sample.rate", "channels")[!c(is.null(samp), is.null(channels))]
+    sav.ind <- apply(!ind[,sav,drop = F], 1, any)
+    
+    inFiles <- fn[sav.ind]
+    
+    outFiles <- file.path(fix, basename(inFiles))
     if(any(wav.m[,"sample.rate"] < samp)) warning("Sample rates lower than samp will be returned unchanged")
     
     mapply(function(x, y) av::av_audio_convert(x,y, channels = channels, sample_rate = samp, verbose = F),
-           fn, outFiles)
+           inFiles, outFiles)
+    
+    print(paste0(length(inFiles), " files reprocessed and saved to '", fix, "'"))
     
   }
   
-  if(rm) return(fn[rm.ind]) else invisible(wav.m)
+  if(rm) return(fn[rm.ind]) else invisible(data.frame(fn = fn, wav.m))
   
 }
