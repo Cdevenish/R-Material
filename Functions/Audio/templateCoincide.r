@@ -66,6 +66,18 @@ templateCoincide <- function(x, round = 0, temps,
   res$pcTemp <- res$n/res$totTemps
   #head(res)
   
+  ## Identify max of scores at same round time
+  
+  tmp2 <- res %>%
+    
+    dplyr::group_by(id, round.time) %>%
+    dplyr::filter(max == max(max))
+  
+  tmp2$maxR <- T
+    
+  res <- merge(res, tmp2, by = c("id", "round.time", "max"), all.x = T)
+  
+  
   # subset so that results only include those where the threshold number of templates (of the total) match
   if(subset){
     res <- subset(res, pcTemp > thresh_temp)
@@ -74,7 +86,7 @@ templateCoincide <- function(x, round = 0, temps,
       
       res <- res %>%
         
-        dplyr::group_by(round.time) %>%
+        dplyr::group_by(id, round.time) %>%
         dplyr::filter(max == max(max)) %>%
         as.data.frame()
       
