@@ -88,7 +88,7 @@ templateCoincide <- function(x, round = 0, temps,
   
   # re order by id, round time, species
   res <- res[order(res$id, res$round.time, res$species),]
-  res <- res[,c("id", "round.time", "species", "n", "max", "pcTemp")]
+  res <- res[,c("id", "round.time", "species", "n", "max", "maxR", "pcTemp")]
   
   if(save.label) {
     
