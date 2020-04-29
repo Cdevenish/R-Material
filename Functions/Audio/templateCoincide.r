@@ -71,29 +71,20 @@ templateCoincide <- function(x, round = 0, temps,
   tmp2 <- res %>%
     
     dplyr::group_by(id, round.time) %>%
-    dplyr::filter(max == max(max))
+    dplyr::summarise(max = max(max))
   
   tmp2$maxR <- T
-    
+  # head(tmp2)
   res <- merge(res, tmp2, by = c("id", "round.time", "max"), all.x = T)
-  
+  #head(res)
   
   # subset so that results only include those where the threshold number of templates (of the total) match
   if(subset){
     res <- subset(res, pcTemp > thresh_temp)
     
-    if(keepMax) {
-      
-      res <- res %>%
-        
-        dplyr::group_by(id, round.time) %>%
-        dplyr::filter(max == max(max)) %>%
-        as.data.frame()
-      
-      
-    }
-    
+    if(keepMax) res <- subset(res, maxR)
   }
+  
   
   # re order by id, round time, species
   res <- res[order(res$id, res$round.time, res$species),]
