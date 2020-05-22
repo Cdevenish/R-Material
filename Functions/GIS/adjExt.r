@@ -10,7 +10,7 @@ adjExt <- function(ext, d = 1000, expand = TRUE, outF){
   
   if(! class(ext) %in% c("Extent", "bbox")) stop("ext must be a sf bbox or raster extent object")
   
-  outF <- match.arg(outF, c("Extent", "bbox"))
+  if(missing(outF)){ outF <- class(ext)} else { outF <- match.arg(outF, c("Extent", "bbox"))}
   
   if(!missing(outF)) cls <- outF else cls <- class(ext)
   
