@@ -17,6 +17,10 @@ wavCheck <- function(fn, samp =44100, duration = 5, channels = 1, bits = 16, rm 
   # equal to the samp, duration, chaqnnel, bits that are not null
   
   # Check libraries av tuneR
+  if(!require("av",character.only = TRUE)) stop("av package not found")
+  if(!require("tuneR",character.only = TRUE)) stop("tuneR package not found")
+  
+  # rownames(installed.packages())
   
   wav.info <- lapply(fn, tuneR::readWave, header = T)
   
