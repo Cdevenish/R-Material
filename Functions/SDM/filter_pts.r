@@ -74,7 +74,6 @@ filter_pts <- function(r, pts, byID, ext, crs, res, orig = c(0,0), writeID = F){
     print(sprintf("%s records eliminated in total", sum(unlist(dups))))
     
     if(!missing(byID)) {
-      print("By species:\n")
       print(sapply(dups, sum))
     }
     # pts.filt <- pts[!dups,]
