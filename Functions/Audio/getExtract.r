@@ -9,7 +9,7 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app, la
   
   library(tuneR)
   
-  # x is a gedetect object
+  # x is a gedetect object or data frame with column "time"
   # fn = vector of filenames (same nrow as gdetect), or a cdetects or cssores object corresponding to gdetect object
   # buffer is time in seconds on either side of detection hit time
   # format for exported audio extract, - only wav at the moment
@@ -22,14 +22,16 @@ getExtract <- function(x, fn, buffer = 5, format = c("wav", "mp3"), dir, app, la
   # new.bn <- basename(sub("_[[:digit:]]{6}_", format(newStartTime, "_%H%M%S_"), x[i]))
   # new.bn <- sub("\\.wav$", "_mod.wav", new.bn)
   
-  if(!all(length(app)==1,is.character(app))) stop("app must be a character vector of length 1")
-  if(missing(app)) app <- NULL
   
-  if(!is.null(label) & is.character(label)){
+  if(missing(app)) app <- NULL else {
+    if(!all(length(app)==1,is.character(app))) stop("app must be a character vector of length 1")
+  }
+  
+  if(!is.null(label) & (is.character(label) | is.factor(label))){
     
-    if(length(label) == 1) labs <- x[,label] else if(length(label) == nrow(x)) labs <- label
+    if(length(label) == 1) labs <- x[,label] else if(length(label) == nrow(x)) labs <- as.character(label)
     
-    } else stop("label must be a character vector of length 1 or same length as x")
+    } else stop("label must be a character vector of length 1 or same nrow as x")
   
   
   from <- x$time - buffer
