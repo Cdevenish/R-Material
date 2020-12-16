@@ -1,4 +1,4 @@
-qdist <- function(a, b, q){
+qDist <- function(a, b, q){
   
   # a is a chr vector with shorter text to be searched for in longer text, b
   # q is the ngram n
