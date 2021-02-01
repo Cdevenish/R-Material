@@ -197,7 +197,14 @@ drawSpectro <- function(fn, wd, sName,
   pal <- pal(nCol)
   # need to fill in background colour if using low cut off. not par("bg") - just plotting area pal[1]
   
-  
+  # Make axis labels.
+  if(axes) {
+    xlab <- "Time (s)"
+    ylab <- "Frequency (kHz)"
+  } else {
+    xlab <- ""
+    ylab <- ""
+  }
   
   #If saving...  get file path to save image of spectrogram and name if missing
   
@@ -235,8 +242,8 @@ drawSpectro <- function(fn, wd, sName,
                     col = pal,
                     breaks = brks,
                     useRaster = TRUE,
-                    xlab = "Time (s)",
-                    ylab = "Frequency (kHz)")
+                    xlab = xlab,
+                    ylab = ylab)
     
     if(boxes){
       
@@ -276,8 +283,8 @@ drawSpectro <- function(fn, wd, sName,
                     col = pal,
                     breaks = brks,
                     useRaster = TRUE,
-                    xlab = "Time (s)",
-                    ylab = "Frequency (kHz)")
+                    xlab = xlab,
+                    ylab = ylab)
     
     if(boxes){
       
