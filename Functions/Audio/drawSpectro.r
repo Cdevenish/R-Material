@@ -10,14 +10,14 @@
 ## file settings
 # fn - wav file location
 # wd # folder to save spectrograms
-# sName # file name for spectogram (eg taken from wav filename - paste0(sub(".*(extr_\\d*)_.*", "\\1_", fn)) )
+# sName # file name for spectogram (taken from wav filename if missing)
 # 
 # draw boxes around sounds
 # boxes - T/F to draw boxes
-# data - data frame with these column names: file (==fn),  start, stop, minFreq, maxFreq (in kHz), origina (if labels)
-# labels - place test label above each box in lines above spectrogram. Usese column 'original' in data
+# data - data frame with these column names: file (==fn),  start, stop, minFreq, maxFreq (in kHz), labName (if labels)
+# labels - place test label above each box in lines above spectrogram. Uses column 'labName' in data
 # data.names - if data is included, and column names do not match above, can include named vector as dictionary for col
-# eg data.names <- c(file = "wav.path", start = "X_min", stop = "X_max", minFreq = "Y_min", maxFreq = "Y_max", Label = "original")
+# eg data.names <- c(file = "wav.path", start = "X_min", stop = "X_max", minFreq = "Y_min", maxFreq = "Y_max", Label = "labName")
 
 # ## FT settings
 # flim = c(0,10) # frequency limits kHz
@@ -61,10 +61,15 @@ drawSpectro <- function(fn, wd, sName,
                         boxes = FALSE, labels = TRUE, fName = FALSE, data, data.names){
   
   
+  
   # process data frame for boxes and/or labels, if present
   if(boxes){
     
-    if(missing(data.names)) colnames(data) %in% c("file", "start", "stop", "minFreq", "maxFreq") else {
+    if(missing(data.names)) {
+      # check names
+      if(!all(c("file", "start", "stop", "minFreq", "maxFreq") %in% colnames(data))) stop("data colnames incorrect") 
+      
+    } else {
       
       data <- data[, data.names]
       # rename 
@@ -73,10 +78,10 @@ drawSpectro <- function(fn, wd, sName,
     }
     
     if(labels)
-      if(missing(data.names)) colnames(data) %in% c("file", "start", "stop", "minFreq", "maxFreq")
+      if(missing(data.names)) if(!"labName" %in% colnames(data)) stop ("data columns incorrect")
     
-    # TODO check label column prsent..  but above will bring it in already.. 
-    }
+    # TODO check label column present.in data.names.  but above will bring it in already.. 
+  }
   
   
   ## helper functions for freq / time pixel clumping
@@ -194,10 +199,13 @@ drawSpectro <- function(fn, wd, sName,
   
   
   
-  #If saving...  get file path to save image of spectrogram
+  #If saving...  get file path to save image of spectrogram and name if missing
   
   ## full name
   if(save){
+    
+    if(missing(sName)) sName <- sub("\\.wav$", "", basename(fn))
+    
     if(fName){
       fp <- file.path(wd, paste0(sName, "_col_", col, 
                                  "_wn_", wn, "_zp_", zp, "_ovlp_", ovlp, 
@@ -207,7 +215,9 @@ drawSpectro <- function(fn, wd, sName,
       # simple name
       fp <- file.path(wd, paste0(sName, ".png"))
     }
+    
   }
+  
     
     
   # print(fp)
@@ -243,7 +253,7 @@ drawSpectro <- function(fn, wd, sName,
                border = "red")}
       }
       
-      # draw labels over boxes, or at top - data must have name column..  original... 
+      # draw labels over boxes, or at top - data must have name column... 'labName'
       if(labels){
         # mid points for plot
         mms$at <- mms$start + (mms$stop - mms$start)/2
@@ -252,7 +262,7 @@ drawSpectro <- function(fn, wd, sName,
         mms <- mms[order(mms$at),]
         line = rep_len(c(0,1), length.out = nrow(mms)) # could increase to 0,1,3 for many labels
         
-        mtext(mms$original, side = 3, line = line, at = mms$at)
+        mtext(mms$labName, side = 3, line = line, at = mms$at)
       }
     }
     dev.off()
@@ -284,19 +294,23 @@ drawSpectro <- function(fn, wd, sName,
              border = "red")}
     }
       
-      # draw labels over boxes, or at top - data must have name column..  original... 
+      # draw labels over boxes, or at top - data must have name column..  labName. 
       if(labels){
-        
         # mid points for plot
-        at <- mms$start + (mms$stop - mms$start)/2
-        mtext(mms$original, side = 3, line = 0, at = at, cex = 0.9)
+        mms$at <- mms$start + (mms$stop - mms$start)/2
+        
+        # make sure is ordered
+        mms <- mms[order(mms$at),]
+        line = rep_len(c(0,1), length.out = nrow(mms)) # could increase to 0,1,3 for many labels
+        
+        mtext(mms$labName, side = 3, line = line, at = mms$at)
       }
       
     }
   }
   
   
-  # return filepath of save image if wanted
-  invisible(fp)
+  # return filepath of saved image if wanted
+  if(save) invisible(fp)
   
 }
