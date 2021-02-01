@@ -17,7 +17,7 @@
 # data - data frame with these column names: file (==fn),  start, stop, minFreq, maxFreq (in kHz), origina (if labels)
 # labels - place test label above each box in lines above spectrogram. Usese column 'original' in data
 # data.names - if data is included, and column names do not match above, can include named vector as dictionary for col
-# eg data.names <- c(file = "fn", start = "xmin", stop = "ymin", minFreq = "ymin", maxFreq = "ymax", = "original")
+# eg data.names <- c(file = "wav.path", start = "X_min", stop = "X_max", minFreq = "Y_min", maxFreq = "Y_max", Label = "original")
 
 # ## FT settings
 # flim = c(0,10) # frequency limits kHz
@@ -192,17 +192,21 @@ drawSpectro <- function(fn, wd, sName,
   pal <- pal(nCol)
   # need to fill in background colour if using low cut off. not par("bg") - just plotting area pal[1]
   
-  # get file path to save image of spectrogram
+  
+  
+  #If saving...  get file path to save image of spectrogram
   
   ## full name
-  if(fName){
-    fp <- file.path(wd, paste0(sName, "_col_", col, 
-                             "_wn_", wn, "_zp_", zp, "_ovlp_", ovlp, 
-                             "_bin_", substr(as.character(binary),1,1), 
-                             "_NR_", substr(as.character(NR),1,1), ".png"))
-  } else {
-    # simple name
-    fp <- file.path(wd, paste0(sName, ".png"))
+  if(save){
+    if(fName){
+      fp <- file.path(wd, paste0(sName, "_col_", col, 
+                                 "_wn_", wn, "_zp_", zp, "_ovlp_", ovlp, 
+                                 "_bin_", substr(as.character(binary),1,1), 
+                                 "_NR_", substr(as.character(NR),1,1), ".png"))
+    } else {
+      # simple name
+      fp <- file.path(wd, paste0(sName, ".png"))
+    }
   }
     
     
