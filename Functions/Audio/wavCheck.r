@@ -5,16 +5,18 @@
 # samp = NULL
 
 
-wavCheck <- function(fn, samp =44100, duration = 5, channels = 1, bits = 16, rm = F, fix){
+wavCheck <- function(fn, samp =44100, duration.min = 5, duration.exact = NULL, channels = 1, bits = 16, rm = F, fix){
   
   # fn are complete file paths for wav files
   # samp is required sample rate (or NULL not to test)
-  # duration is minimum duration required (or NULL not to test)
+  # duration.min is minimum duration required (ie files must be equal or longer) (or NULL not to test)
+  # duration.exact is the exact duration to test for (or NULL not to test)
   # Channels are the required number of channels (or NULL not to test)
   # bits are the required bit depth of the wav (or NULL not to test)
   # rm. Logical , return vector of filepaths without those with duration < duration, and with 
   # sample rates not equal to samp. Otherwise will return a data frame with results of check.  With columns 
   # equal to the samp, duration, chaqnnel, bits that are not null
+  # fix is a folder to store resampled files, if present, then files not at samp will be resampled and stored here.
   
   # Check libraries av tuneR
   if(!require("av",character.only = TRUE)) stop("av package not found")
@@ -38,7 +40,8 @@ wavCheck <- function(fn, samp =44100, duration = 5, channels = 1, bits = 16, rm 
   ind <- cbind(sample.rate = wav.m[,"sample.rate"] == samp,
                channels = wav.m[,"channels"] == channels,
                bits = wav.m[,"bits"] == bits,
-               duration = wav.m[,"duration"] > duration)
+               duration.min = wav.m[,"duration"] >= duration.min,
+               duration.exact = wav.m[, "duration"] == duration.exact)
   
   # head(ind)
   rm.ind <- apply(ind, 1, all)

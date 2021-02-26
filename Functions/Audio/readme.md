@@ -4,7 +4,7 @@ Most functions are for specific file types (e.g. processing .wav files from Fron
 
 You can source these from here with something like this (*note this links to the raw version of the file:*):
 
-`source("https://raw.githubusercontent.com/Cdevenish/R-Material/master/Functions/Audio/splitWav.r"")`
+`source("https://raw.githubusercontent.com/Cdevenish/R-Material/master/Functions/Audio/splitWav.r")`
 
 
 ### Descriptions

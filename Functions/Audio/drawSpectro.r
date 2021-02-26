@@ -231,7 +231,7 @@ drawSpectro <- function(fn, wd, sName,
   
   # save spectrogram to file or plot to screen
   if(save){
-    png(fp, width = wdth, height = hght)
+    png(fp, width = wdth, height = hght, units = "px")
     
     if(!axes) par(mar = c(0,0,0,0), oma = c(0,0,0,0))
     
