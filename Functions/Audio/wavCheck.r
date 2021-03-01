@@ -1,6 +1,6 @@
 
 # fn <- wavs.mtch
-# samp =44100; duration = 5; channels = 1; bits = 16
+# samp =44100; duration.min = 5; channels = 1; bits = 16
 # duration = NULL
 # samp = NULL
 
@@ -53,7 +53,7 @@ wavCheck <- function(fn, samp =44100, duration.min = 5, duration.exact = NULL, c
   if(!missing(fix)) {
     
     if(!dir.exists(fix)) stop("fix must be a valid directory to store the reprocessed files")
-    if(is.null(duration) & is.null(channels)) stop("samp and/or channels must be present for reprocessing option")
+    if(is.null(samp) & is.null(channels)) stop("samp and/or channels must be present for reprocessing option")
     
     sav <- c("sample.rate", "channels")[!c(is.null(samp), is.null(channels))]
     sav.ind <- apply(!ind[,sav,drop = F], 1, any)
