@@ -5,16 +5,24 @@ adjExt <- function(ext, d = 1000, expand = TRUE, outF, projTo, projFrom){
   ## ext is extent object as in,  sf::st_bbox or raster::extent()
   ## d is the value to which the extent should be rounded to, in spatial object units (eg m)
   ## expand is whether to expand the extent to the nearest d, or shrink it.
-  ## outF controls format of returned exent. 'Extent' for raster::Extent class, 'bbox' for sf::st_bbox()
+  ## outF controls format of returned exent. 'Extent' for raster::Extent class, 
+  ## bbox' for sf::st_bbox() or 'sf; for sf object
   ## if missing, then output format follows input format of ext
   ## to project the extent to a new projection, both projTo and projFrom must be present as crs arguments
   ## in a format accepted by st_transform()
   
-  if(! class(ext) %in% c("Extent", "bbox")) stop("ext must be a sf bbox or raster extent object")
+  if(! class(ext)[1] %in% c("Extent", "bbox", "sf")) stop("ext must be a sf bbox or raster extent object")
   
-  if(missing(outF)){ outF <- class(ext)} else { outF <- match.arg(outF, c("Extent", "bbox"))}
+  if(missing(outF)){ outF <- class(ext)[1]} else { outF <- match.arg(outF, c("Extent", "bbox", "sf"))}
   
-  if(!missing(outF)) cls <- outF else cls <- class(ext)
+  if(class(ext)[1] == "sf") {
+    
+    crs <- st_crs(ext)
+    ext <- st_bbox(ext)
+  
+  }
+  
+  if(!missing(outF)) cls <- outF else cls <- class(ext)[1]
   
   ext.std <- st_bbox(ext)
   
@@ -45,7 +53,10 @@ adjExt <- function(ext, d = 1000, expand = TRUE, outF, projTo, projFrom){
     res <- switch(cls, 
                   
                   Extent = raster::extent(ext.new[c("xmin", "xmax", "ymin", "ymax")]),
-                  bbox = sf::st_bbox(ext.new))
+                  bbox = sf::st_bbox(ext.new),
+                  sf = st_sf(data.frame(id = 1, geometry = sf::st_as_sfc(sf::st_bbox(ext.new))), crs = crs)
+    )
+    
 
   return(res)
 }
