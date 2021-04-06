@@ -11,18 +11,20 @@
 ## Change res names so that error checking is indiependent. for now with repeated rows in out
 
 
-readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
+readLabels <- function(x, type, tStop = 15, names2match, rename = T, includeErrors = F){
   
   # x are file paths to label text files
   # type is software used to create labels ie one of c("Audacity", "Raven")
   # renames is to rename each template with unique id within name (eg. in species)
   #
+  # tStop is max duration to check against.
   # names2match is optional character vector of (species) names/codes to match exactly with label name.
   # If names do not match a warning is given, showing where they do not match.
   
   # includeErrors - logical. if T, then a list is returned with first element a data frame with 
   # label info, and a second element with errors in freq/time/name filters
   # NOTE this argument changes the class and length of the returned object.
+  # 
   
   #type <- c("Audacity", "Raven")
   #
@@ -98,7 +100,7 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
   
   ## Freq filter
   ## check frequencies - for misclassified freqs
-  ind <- res[,"minFreq"] <= res[,"maxFreq"] 
+  ind <- res[,"minFreq"] <= res[,"maxFreq"] | res[,"minFreq"] < 0
   # sum(ind)
   
   # get data frame of mismatched freqs
@@ -109,7 +111,7 @@ readLabels <- function(x, type, names2match, rename = T, includeErrors = F){
   
   # TIME FILTER
   ## and for misclasified times
-  ind2 <- res[,"start"] <= res[,"stop"] # sum(!ind2)
+  ind2 <- res[,"start"] <= res[,"stop"] | res[,"stop"] > tStop # sum(!ind2)
   
   #sum(ind2) == nrow(res)
   outTimes <- res[!ind2,]
