@@ -17,14 +17,14 @@ adjExt <- function(ext, d = 1000, expand = TRUE, outF, projTo, projFrom){
   
   if(class(ext)[1] == "sf") {
     
-    crs <- st_crs(ext)
-    ext <- st_bbox(ext)
+    crs <- sf::st_crs(ext)
+    ext <- sf::st_bbox(ext)
   
   }
   
   if(!missing(outF)) cls <- outF else cls <- class(ext)[1]
   
-  ext.std <- st_bbox(ext)
+  ext.std <- sf::st_bbox(ext)
   
   if(expand) {
     fun1 <- floor
