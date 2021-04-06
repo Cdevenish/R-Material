@@ -1,5 +1,5 @@
 # get common extent of several rasters  [ADD sf objects too... ]
-comExtent <- function(..., out = c("extent", "bbox", "vector")) {
+comExt <- function(..., out = c("extent", "bbox", "vector")) {
   
   dots <- list(...)
   
