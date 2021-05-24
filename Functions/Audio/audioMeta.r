@@ -5,7 +5,7 @@
 # audio.df <- audioMeta(f)
 
 
-audioMeta <- function(x, tz = "Asia/Jakarta", sort = F, ...){
+audioMeta <- function(x, tz = "Asia/Jakarta", sort = F, parallel = FALSE, nCores, ...){
   
   library(tuneR)
   
@@ -21,7 +21,25 @@ audioMeta <- function(x, tz = "Asia/Jakarta", sort = F, ...){
   
   
   # get duration
-  w <- lapply(x, function(z) try(readWave(z, header = T), silent = T))
+  if(parallel){
+    
+    if(missing(nCores)) nCores <- parallel::detectCores()-1
+    
+    library(parallel)
+    cl <- makeCluster(nCores)
+    clusterExport(cl, c("x"), envir=environment()) # export filenames - search in local function environment
+    
+    clusterEvalQ(cl, {
+      library(tuneR)
+    })
+    
+    w <- parLapply(cl, x, function(z) try(tuneR::readWave(z, header = T), silent = T))
+    
+    stopCluster(cl)
+    
+  } else w <- lapply(x, function(z) try(tuneR::readWave(z, header = T), silent = T))
+  
+  
   
   tryError.ind <- vapply(w, function(x) inherits(x, "try-error"), logical(1))
   noErr <- sum(tryError.ind)
