@@ -5,12 +5,13 @@
 # samp = NULL
 
 
-wavCheck <- function(fn, samp =44100, duration.min = 5, duration.exact = NULL, channels = 1, bits = 16, rm = F, fix){
+wavCheck <- function(fn, samp =44100, duration.min = 5, duration.exact = NULL, 
+                     channels = 1, bits = 16, rm = F, fix, parallel = FALSE, nCores){
   
   # fn are complete file paths for wav files
   # samp is required sample rate (or NULL not to test)
-  # duration.min is minimum duration required (ie files must be equal or longer) (or NULL not to test)
-  # duration.exact is the exact duration to test for (or NULL not to test)
+  # duration.min is minimum duration (s) required (ie files must be equal or longer) (or NULL not to test)
+  # duration.exact is the exact duration (s) to test for (or NULL not to test)
   # Channels are the required number of channels (or NULL not to test)
   # bits are the required bit depth of the wav (or NULL not to test)
   # rm. Logical , return vector of filepaths without those with duration < duration, and with 
@@ -24,7 +25,23 @@ wavCheck <- function(fn, samp =44100, duration.min = 5, duration.exact = NULL, c
   
   # rownames(installed.packages())
   
-  wav.info <- lapply(fn, tuneR::readWave, header = T)
+  if(parallel){
+    
+    if(missing(nCores)) nCores <- parallel::detectCores()-1
+    
+    library(parallel)
+    cl <- makeCluster(nCores)
+    clusterExport(cl, c("fn")) # multiple items in a vector.. c("dhiy.rList", "wgs.aoi")
+    
+    clusterEvalQ(cl, {
+      library(tuneR)
+      })
+    
+    wav.info <- parLapply(cl, fn, tuneR::readWave, header = T)
+    
+    stopCluster(cl)
+    
+  } else wav.info <- lapply(fn, tuneR::readWave, header = T)
   
   # check length 4
   if(any(!lengths(wav.info) == 4)) stop("check!!")

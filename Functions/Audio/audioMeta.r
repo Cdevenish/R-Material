@@ -69,12 +69,17 @@ audioMeta <- function(x, tz = "Asia/Jakarta", sort = F, ...){
   # recorder ID - for recorders to start, optionally, with a single letter and then two digits
   id <- gsub("_", "", regmatches(xn, regexpr("^[[:alpha:]]?[[:digit:]]{1,2}_", text = xn)))
   
+  Mountain = sub(".*\\/Audio\\/([[:alpha:]]*_?[[:alpha:]]*)_\\d*\\/.*", "\\1", x)
+  folder = sub(".*\\/Audio\\/\\d{0,2}_?([[:alpha:]]*_?[[:alpha:]]*_\\d*)\\/.*", "\\1", x)
+  SID <- sub(".*_(\\d)", "S\\1", folder)
   
   info.df <- data.frame(fileLoc = dirname(x), # file location
                         filename = xn,
                         path = file.path(dirname(x), xn),
                         size = f.size,
                         recorder = id,
+                        mountain = mountain,
+                        S_ID = SID,
                         date_start = date_start,
                         time_start = format(dateTime_start, "%H:%M"),
                         dateTime_start = dateTime_start,
