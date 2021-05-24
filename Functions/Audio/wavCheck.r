@@ -31,7 +31,7 @@ wavCheck <- function(fn, samp =44100, duration.min = 5, duration.exact = NULL,
     
     library(parallel)
     cl <- makeCluster(nCores)
-    clusterExport(cl, c("fn")) # multiple items in a vector.. c("dhiy.rList", "wgs.aoi")
+    clusterExport(cl, c("fn"), envir=environment()) # multiple items in a vector.. c("dhiy.rList", "wgs.aoi")
     
     clusterEvalQ(cl, {
       library(tuneR)
