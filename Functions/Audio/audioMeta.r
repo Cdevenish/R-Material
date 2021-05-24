@@ -87,7 +87,7 @@ audioMeta <- function(x, tz = "Asia/Jakarta", sort = F, parallel = FALSE, nCores
   # recorder ID - for recorders to start, optionally, with a single letter and then two digits
   id <- gsub("_", "", regmatches(xn, regexpr("^[[:alpha:]]?[[:digit:]]{1,2}_", text = xn)))
   
-  Mountain = sub(".*\\/Audio\\/([[:alpha:]]*_?[[:alpha:]]*)_\\d*\\/.*", "\\1", x)
+  mountain = sub(".*\\/Audio\\/([[:alpha:]]*_?[[:alpha:]]*)_\\d*\\/.*", "\\1", x)
   folder = sub(".*\\/Audio\\/\\d{0,2}_?([[:alpha:]]*_?[[:alpha:]]*_\\d*)\\/.*", "\\1", x)
   SID <- sub(".*_(\\d)", "S\\1", folder)
   
