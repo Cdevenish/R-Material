@@ -1,15 +1,16 @@
 ### Function to reduce variables by colinearity using VIF ###
 
-viffer <- function(x, z = 5, df = FALSE){
+viffer <- function(x, z = 5, keep = NULL, df = FALSE){
   
   ## function will suggest a set of numeric variables which are not collinear as determined
   ## by a VIF threshold. Will remove variables with max VIF above z, one by one, until all VIF are below
-  ## threshold or just two variables remain.
+  ## threshold or just max of 2 or length(keep) variables remain.
   
   # x is a data frame with numeric columns only. If a matrix it is coerced to data frame
   # z is a threshold for VIF, typically, 2, 5, or 10
-  # df - return a data frame of only VIF values for remaining variables (default), with variable names in
-  # rownames, or return a data frame with final set of variables, with collinear variables removed
+  # keep - character vector of variable names (matching colnames in x) of variables to keep always
+  # df - return a data frame of only VIF values for remaining variables (default) with variable names in
+  # rownames, or (TRUE) return a data frame with final set of variables, with collinear variables removed
   
   ## Functions for VIF adapted from Zuur 2009 AED package #####
   ## from Mixed Effects models and extensions in ecology with R
@@ -77,20 +78,26 @@ viffer <- function(x, z = 5, df = FALSE){
   
   if(!all(sapply(x, is.numeric))) stop("All columns should be numeric")
   
+  if(!is.null(keep)) {
+    if(any(!keep %in% colnames(x))) stop("Variables in keep must match colnames of x")
+    varN <- max(2, length(keep)) # adjust minimum number of vars to remain at end
+  } else varN <- 2
+  
   z1 <- vif(x)
   counter <- 0
   
-  while(max(z1$GVIF) >= z & nrow(z1) > 2){
+  while(max(z1$GVIF[!rownames(z1) %in% keep]) >= z & nrow(z1) > varN){
     
     counter <- counter + 1
-    del <- which(z1$GVIF == max(z1$GVIF))
+    ind <- which(z1$GVIF[!rownames(z1) %in% keep] == max(z1$GVIF[!rownames(z1) %in% keep]))
+    del <- rownames(z1)[!rownames(z1) %in% keep][ind]
     if(length(del) > 1){
       del <- sample(del,1)
       warning("Identical VIF scores, choosing one at random")
     }
     
-    cat("step ", counter, ": ", colnames(x)[del], " deleted\n", sep = "")
-    x[,del] <- NULL
+    cat("step ", counter, ": ", del, " deleted\n", sep = "")
+    x[, del] <- NULL
     # head(x)
     
     z1 <- vif(x)
@@ -100,4 +107,17 @@ viffer <- function(x, z = 5, df = FALSE){
   
   if(!df) return(z1) else return(x)
 }
+
+# # testing
+# set.seed(99)
+# x <- as.data.frame(lapply(1:5, function(x) rnorm(100, x)))
+# x <- cbind(x, t(t(x)*(c(1,2,5,10,11))))
+# colnames(x) <- letters[1:10]
+# x[6:10] <- x[6:10] + as.data.frame(lapply(1:5, function(x) rnorm(100, 0, 2)))
+# pairs(x)
+# 
+# viffer(x)
+# 
+# viffer(x, keep = c("h", "c"))
+
 
