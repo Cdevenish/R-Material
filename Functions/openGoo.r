@@ -33,8 +33,8 @@ openGoo <- function(sp, crs = "EPSG:4326", yx = FALSE, lonlat = c("lon", "lat"))
     
     colnames(df) <- c("x", "y")
     df$ID <- seq(1, nrow(df), 1)
-    coordinates(df) <- c("x", "y")
-    proj4string(df) <- CRS(crs)
+    
+    df <- sf::st_as_sf(df, coords = c("x", "y"), crs = crs)
     
   } else if(inherits(sp, "data.frame")){
     
