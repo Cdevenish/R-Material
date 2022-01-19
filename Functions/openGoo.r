@@ -1,24 +1,26 @@
-# 5.3 open coords in google earth ####
-
-## Also on GIT ojo...
+##### Open coordinates in google earth ####
 
 ## update to include sf objects as well
 ## use shell to open programm rather than relying on file extention associations
+# updated to crs to EPSG from +proj=longlat +datum=WGS84
 
-openGoo <- function(sp, crs = "+proj=longlat +datum=WGS84", yx = FALSE){
+openGoo <- function(sp, crs = "EPSG:4326", yx = FALSE, lonlat = c("lon", "lat")){
   
-  ## opens coordinates from clipboard/spatial object (sp, sf) in google earth by 
+  ## opens coordinates from clipboard/spatial object(sp, sf)/dataframe in google earth by 
   ## creating a kml in temporary directory
   
-  ## crs is the projection of the coordinates, if copied from clipboard, ignored if sp is present
+  ## crs is the projection of the coordinates, if copied from clipboard or in dataframe, ignored if sp is present
   ## sp can be an sf or sp spatial points object, or missing, if coordinates are copied onto clipboard
   
   ## yx is logical, if data is Lat Lon, then use TRUE to switch to Lon Lat (x y)
   
-  wgs <- "+proj=longlat +datum=WGS84"
+  ## lonlat is a length two character vector with column names corresponding to longitude and latitude, respectively
   
-  require(sp)
-  require(rgdal)
+  # wgs <- "+proj=longlat +datum=WGS84"
+  # wgs.epsg <- "EPSG:4326"
+  
+  # require(sp)
+  # require(rgdal)
   
   if(missing(sp)) {
     
@@ -28,20 +30,27 @@ openGoo <- function(sp, crs = "+proj=longlat +datum=WGS84", yx = FALSE){
       df[,3] <- df[,1]
       df[,1] <- NULL
     }
+    
     colnames(df) <- c("x", "y")
     df$ID <- seq(1, nrow(df), 1)
     coordinates(df) <- c("x", "y")
     proj4string(df) <- CRS(crs)
     
-  } else if("sf" %in% class(sp)) df <- as(sp, "Spatial")
+  } else if(inherits(sp, "data.frame")){
+    
+    df <- sf::st_as_sf(sp, coords = lonlat, crs= crs)
+    
+  } else if(inherits(sp, "sp")) {
+    df <- sf::st_as_sf(sp) } else if(!inherits(sp, "sf")) {
+      stop("sp must be either data.frame, sp or sf object")
+    }
   
   # proj4string(df)
-  
-  
-  if(!identical(proj4string(df), wgs)) df <- spTransform(df, wgs)
+  ## no need to project, kml driver does this...  just need projection
+  # if(!identical(sf::st_crs(df)$input, wgs.epsg)) df <- sf::st_transform(df, wgs.epsg)
   
   tmp <- tempfile(pattern = "coords", fileext=".kml")
-  writeOGR(df, dsn=tmp, layer=basename(tmp), driver="KML")
+  sf::st_write(df, dsn=tmp, layer=basename(tmp), driver="KML")
   
   shell.exec(tmp) # open using default program in windows
 }
