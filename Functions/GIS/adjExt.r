@@ -11,18 +11,18 @@ adjExt <- function(ext, d = 1000, expand = TRUE, outF, projTo, projFrom){
   ## to project the extent to a new projection, both projTo and projFrom must be present as crs arguments
   ## in a format accepted by st_transform()
   
-  if(! class(ext)[1] %in% c("Extent", "bbox", "sf")) stop("ext must be a sf bbox or raster extent object")
+  if(!inherits(ext, c("Extent", "SpatExtent", "bbox", "sf"))) stop("ext must be a sf bbox, raster or terra extent object")
   
-  if(missing(outF)){ outF <- class(ext)[1]} else { outF <- match.arg(outF, c("Extent", "bbox", "sf"))}
+  if(missing(outF)){ outF <- class(ext)[1]} else { outF <- match.arg(outF, c("Extent", "SpatExtent", "bbox", "sf"))}
   
-  if(class(ext)[1] == "sf") {
+  if(inherits(ext, "sf")) {
     
     crs <- sf::st_crs(ext)
     ext <- sf::st_bbox(ext)
   
   }
   
-  if(!missing(outF)) cls <- outF else cls <- class(ext)[1]
+  #if(!missing(outF)) cls <- outF else cls <- class(ext)[1]
   
   ext.std <- sf::st_bbox(ext)
   
@@ -50,9 +50,10 @@ adjExt <- function(ext, d = 1000, expand = TRUE, outF, projTo, projFrom){
   }
   
     
-    res <- switch(cls, 
+    res <- switch(outF, 
                   
                   Extent = raster::extent(ext.new[c("xmin", "xmax", "ymin", "ymax")]),
+                  SpatExtent = terra::ext(ext.new[c("xmin", "xmax", "ymin", "ymax")]),
                   bbox = sf::st_bbox(ext.new),
                   sf = st_sf(data.frame(id = 1, geometry = sf::st_as_sfc(sf::st_bbox(ext.new))), crs = crs)
     )
