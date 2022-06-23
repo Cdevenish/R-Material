@@ -39,16 +39,21 @@ coordCon <- function(df=NULL, x="Lon", y="Lat", prjFROM="+proj=longlat +datum=WG
   df$ID <- 1:nrow(df)
   df.na <- df[complete.cases(df),] 
   
-  coordinates(df.na) <- c("x", "y")
-  proj4string(df.na) <- CRS(prjFROM)
-  res <- spTransform(df.na, CRS(prjTO))
+  # coordinates(df.na) <- c("x", "y")
+  # proj4string(df.na) <- CRS(prjFROM)
+  # res <- spTransform(df.na, CRS(prjTO))
+  # res <- data.frame(res)
+  # res[,4] <- NULL
+  # colnames(res)[2:3] <- newXY
+  # df.res <- merge(df, res, by = "ID", all = T)
+  # df.res$ID <- NULL
   
-  res <- data.frame(res)
-  res[,4] <- NULL
-  colnames(res)[2:3] <- newXY
+  df.na <- sf::st_as_sf(df.na, coords = c("x", "y"), crs = prjFROM)
+  res <- sf::st_transform(df.na, crs = prjTO)
+  res <- data.frame(sf::st_coordinates(res), ID=res$ID)
+  colnames(res)[1:2] <- newXY
   df.res <- merge(df, res, by = "ID", all = T)
   df.res$ID <- NULL
-  
   
   if (cls=="NULL"){
     if(nrow(df.res) < 500){ # clipboard maxes out at two columns and about 900 rows....
